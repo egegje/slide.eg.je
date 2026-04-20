@@ -19,10 +19,6 @@
     root.setAttribute('data-motion', state.motion ? 'on' : 'off');
     root.setAttribute('data-hero', state.hero);
     root.setAttribute('lang', state.lang);
-    // Toggle all [data-en] / [data-ru]
-    document.querySelectorAll('[data-en]').forEach(el => {
-      el.textContent = state.lang === 'ru' ? (el.dataset.ru || el.textContent) : el.dataset.en;
-    });
   }
 
   let state = { ...defaults };
@@ -36,23 +32,7 @@
       } catch (e) {}
     },
   };
-  apply(state);
-
-  // Language toggle (works even without tweaks panel)
-  document.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-lang-set]');
-    if (!t) return;
-    window.__drift.set({ lang: t.dataset.langSet });
-    document.querySelectorAll('[data-lang-set]').forEach(b => {
-      b.classList.toggle('on', b.dataset.langSet === t.dataset.langSet === true);
-    });
-    document.querySelectorAll('.lang button').forEach(b => {
-      b.classList.toggle('on', b.dataset.langSet === state.lang);
-    });
-  });
-
-  // Edit-mode protocol
-  window.addEventListener('message', (ev) => {
+  apply(state);  window.addEventListener('message', (ev) => {
     const d = ev.data || {};
     if (d.type === '__activate_edit_mode') {
       document.querySelector('.tweaks')?.classList.add('on');
