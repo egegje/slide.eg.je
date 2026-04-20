@@ -79,4 +79,31 @@
     document.querySelectorAll('.lang button').forEach(b =>
       b.classList.toggle('on', b.dataset.langSet === state.lang));
   });
+
+  // Inject mobile hamburger + drawer toggle into every .topbar
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.topbar').forEach((bar) => {
+      const inner = bar.querySelector('.topbar__inner');
+      if (!inner || bar.querySelector('.topbar__burger')) return;
+      const burger = document.createElement('button');
+      burger.className = 'topbar__burger';
+      burger.setAttribute('aria-label', 'Open menu');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.innerHTML = '<span></span><span></span><span></span>';
+      inner.appendChild(burger);
+      burger.addEventListener('click', () => {
+        const open = bar.classList.toggle('topbar--open');
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.classList.toggle('no-scroll', open);
+      });
+      // Close on nav link click
+      bar.querySelectorAll('.nav a').forEach((a) => {
+        a.addEventListener('click', () => {
+          bar.classList.remove('topbar--open');
+          burger.setAttribute('aria-expanded', 'false');
+          document.body.classList.remove('no-scroll');
+        });
+      });
+    });
+  });
 })();

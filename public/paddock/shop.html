@@ -1,19 +1,96 @@
 <!doctype html>
-<html lang="ru"><head>
-<meta charset="utf-8"><title>Shop — Paddock</title>
+<html lang="en" data-variant="paddock">
+<head>
+<meta charset="utf-8">
+<title>Shop — Paddock — drift.eg.je</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared.css">
 <link rel="stylesheet" href="paddock.css">
-<style>body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--fg);font-family:var(--font-body)}
-.box{text-align:center;padding:40px;max-width:520px}
-h1{font-family:var(--font-head);font-size:clamp(40px,6vw,80px);margin:0 0 16px;text-transform:uppercase;letter-spacing:-0.01em}
-h1 span{color:var(--accent)}
-p{color:var(--fg-dim);line-height:1.5;margin-bottom:24px}
-a{display:inline-block;padding:12px 20px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;text-decoration:none}
-a:hover{filter:brightness(1.1)}</style>
-</head><body>
-<div class="box">
-<h1>shop<br><span>скоро</span></h1>
-<p>Страница в разработке. Как только выберете вариант для финального сайта — здесь появится контент с реальными данными из drift.eg.je.</p>
-<a href="home.html">← на главную</a>
-</div>
-</body></html>
+</head>
+<body class="pad-body">
+
+<div class="pad-strip"></div>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="../index.html">
+      <svg class="monster-head" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="var(--accent)" stroke="none"/>
+      </svg>
+      DRIFT<b>.EG.JE</b>
+    </a>
+    <nav class="nav">
+      <a href="home.html">Home</a>
+      <a href="drivers.html">Drivers</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="tracks.html">Tracks</a>
+      <a class="active" href="shop.html">Shop</a>
+    </nav>
+    <div class="topbar__right">
+      <a class="btn btn--primary" href="#">Join</a>
+    </div>
+  </div>
+</header>
+
+<section class="pad-section">
+  <div class="pad-section__head">
+    <span class="num">04</span>
+    <h2>Services</h2>
+    <span class="meta">4 DIRECTIONS<br>DARK FORCE</span>
+  </div>
+
+  <p class="pad-intro">
+    Евгений Викторович, это 4 услуги из базы drift.eg.je — уроки, съёмка, техподдержка и ливреи. Цены указаны, можете править через админку. Кнопки ведут на ваш Telegram.
+  </p>
+
+  <div class="pad-services" id="services-grid"></div>
+</section>
+
+<footer class="pad-footer">
+  <div class="pad-footer__mono">
+    <span>© 2026 DRIFT.EG.JE</span>
+    <span>Paddock variant · shop</span>
+  </div>
+</footer>
+
+<script>
+window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
+  "accent": "orange",
+  "density": "comfy",
+  "motion": true,
+  "hero": "video",
+  "lang": "ru"
+}/*EDITMODE-END*/;
+</script>
+<script src="../drift-data.js"></script>
+<script src="../shared.js"></script>
+<script>
+(function () {
+  function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+  var data = window.DRIFT_DATA || {};
+  var list = data.services || [];
+  var host = document.getElementById('services-grid');
+  if (!host) return;
+  var tapes = { 'drift-lessons': 'LESSONS', 'photo-video': 'MEDIA', 'tech-support': 'TECH', 'livery-design': 'LIVERY' };
+  host.innerHTML = list.map(function (s) {
+    var cta = s.contact ? '<a class="btn btn--primary" href="' + esc(s.contact) + '" target="_blank" rel="noopener">' + esc(s.cta || 'Request') + ' →</a>' : '';
+    var tape = tapes[s.slug] || '';
+    return '' +
+      '<div class="pad-service">' +
+        (tape ? '<span class="pad-service__tape">' + esc(tape) + '</span>' : '') +
+        '<div class="pad-service__name">' + esc(s.name) + '</div>' +
+        '<div class="pad-service__short">' + esc(s.short) + '</div>' +
+        '<div class="pad-service__long">' + esc(s.long) + '</div>' +
+        '<div class="pad-service__foot">' +
+          '<div class="pad-service__price">' + esc(s.price) + '</div>' +
+          cta +
+        '</div>' +
+      '</div>';
+  }).join('');
+})();
+</script>
+</body>
+</html>

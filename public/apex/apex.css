@@ -2,6 +2,22 @@
 
 [data-variant="apex"] {
   --edge: oklch(0.10 0.01 250);
+  --font-display: 'Oswald', 'Bebas Neue', 'Impact', sans-serif;
+}
+
+/* Russian-friendly display font overrides */
+.apex-hero__title,
+.apex-hero__event .name,
+.apex-section__head h2,
+.apex-driver__info .name,
+.apex-event__name,
+.apex-event__date,
+.apex-cta h3,
+.apex-footer h5,
+.apex-marquee__track,
+.apex-countdown__cell b {
+  font-family: var(--font-display);
+  font-weight: 700;
 }
 
 .apex-body {
@@ -443,4 +459,233 @@
   .apex-event__track, .apex-event__status { display: none; }
   .apex-hero__foot { grid-template-columns: 1fr; }
   .apex-footer__grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Simple intro paragraph */
+.apex-intro {
+  max-width: 760px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+  margin-bottom: 40px;
+}
+
+/* Tracks grid */
+.apex-tracks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+@media (max-width: 720px) { .apex-tracks { grid-template-columns: 1fr; } }
+.apex-track {
+  background: oklch(0.16 0.012 250);
+  padding: 28px;
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all .2s var(--ease);
+}
+.apex-track:hover { border-color: var(--accent); transform: translateY(-3px); }
+.apex-track__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.apex-track__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.apex-track__lvl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-transform: uppercase;
+  border: 1px solid var(--accent);
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.apex-track__loc {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+  text-transform: uppercase;
+}
+.apex-track__desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+}
+.apex-track__foot {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.apex-track__foot a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 2px;
+}
+
+/* Services grid */
+.apex-services {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+@media (max-width: 720px) { .apex-services { grid-template-columns: 1fr; } }
+.apex-service {
+  position: relative;
+  padding: 40px 32px;
+  background: oklch(0.16 0.012 250);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  transition: all .2s var(--ease);
+}
+.apex-service:hover { background: oklch(0.20 0.014 250); }
+.apex-service__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 42px;
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  margin-bottom: 12px;
+}
+.apex-service__short {
+  font-size: 15px;
+  color: var(--accent);
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+.apex-service__long {
+  font-size: 14px;
+  color: var(--fg-dim);
+  line-height: 1.55;
+  margin-bottom: 24px;
+}
+.apex-service__foot {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.apex-service__price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--fg);
+  letter-spacing: 0.01em;
+}
+
+/* Instructional note block */
+.apex-note {
+  padding: 40px;
+  background: oklch(0.16 0.012 250);
+  border: 1px dashed var(--line-strong);
+  margin-bottom: 32px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+}
+.apex-note b { color: var(--fg); }
+
+/* Mock label for events */
+.apex-event--mock { opacity: 0.55; }
+.apex-event--mock::before {
+  content: "ПРИМЕР";
+  display: inline-block;
+  margin-right: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 2px 6px;
+  vertical-align: middle;
+}
+
+/* ============================================================
+   APEX — mobile responsive
+   ============================================================ */
+
+@media (max-width: 820px) {
+  .apex-hero {
+    min-height: auto;
+    padding: 40px 20px 32px;
+  }
+  .apex-hero__ticker {
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 10px;
+    margin-bottom: 28px;
+  }
+  .apex-hero__title {
+    font-size: clamp(56px, 16vw, 110px);
+    line-height: 0.9;
+  }
+  .apex-hero__foot {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-top: 36px;
+  }
+  .apex-hero__cta { justify-content: flex-start; }
+  .apex-hero__flag { display: none; }
+
+  .apex-marquee__track { font-size: 20px; gap: 28px; }
+  .apex-marquee__track span::after { margin-left: 28px; }
+
+  .apex-section { padding: 60px 20px; }
+  .apex-section__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .apex-section__head h2 { font-size: clamp(40px, 12vw, 64px); }
+
+  .apex-drivers { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .apex-driver__info .name { font-size: 18px; }
+
+  .apex-event { grid-template-columns: auto 1fr auto; gap: 14px; padding: 18px 16px; }
+  .apex-event__date { font-size: 36px; }
+  .apex-event__name { font-size: 16px; }
+
+  .apex-cta { padding: 60px 20px; }
+  .apex-cta h3 { font-size: clamp(36px, 10vw, 56px); }
+
+  .apex-footer { padding: 40px 20px; }
+  .apex-footer__grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .apex-footer__mono { flex-direction: column; gap: 6px; align-items: flex-start; }
+
+  .apex-services, .apex-tracks { grid-template-columns: 1fr; gap: 12px; }
+  .apex-service { min-height: 0; padding: 28px 20px; }
+  .apex-track { padding: 20px; }
+  .apex-intro { padding: 0 4px; }
+}
+
+@media (max-width: 480px) {
+  .apex-drivers { grid-template-columns: 1fr; }
+  .apex-event { grid-template-columns: auto 1fr; }
+  .apex-event__arrow { display: none; }
+  .apex-footer__grid { grid-template-columns: 1fr; }
+  .apex-countdown { flex-wrap: wrap; }
 }

@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>drift.eg.je — redesign</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>drift.eg.je — three design variants</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <style>
   body {
@@ -24,6 +24,12 @@
     width: 100%;
     flex: 1;
   }
+  @media (max-width: 820px) {
+    .hub { padding: 48px 20px 80px; }
+    .hub__meta { gap: 10px; flex-wrap: wrap; margin-bottom: 24px; font-size: 10px; }
+    .hub__lede { font-size: 15px; margin-bottom: 48px; }
+    .hub__foot { flex-direction: column; gap: 14px; margin-top: 48px; padding-top: 24px; }
+  }
   .hub__meta {
     display: flex;
     gap: 16px;
@@ -36,15 +42,19 @@
   }
   .hub__meta b { color: var(--accent); }
   .hub h1 {
-    font-family: var(--font-head);
-    font-size: clamp(60px, 9vw, 160px);
-    line-height: 1.02;
-    letter-spacing: -0.01em;
+    font-family: 'Oswald', 'Bebas Neue', sans-serif;
+    font-weight: 700;
+    font-size: clamp(44px, 6.5vw, 112px);
+    line-height: 1.05;
+    letter-spacing: -0.005em;
     text-transform: uppercase;
     margin-bottom: 24px;
   }
   .hub h1 span { color: var(--accent); }
-  :root[lang="ru"] .hub h1 { font-size: clamp(52px, 7.5vw, 128px); line-height: 1.05; }
+  .variant__title {
+    font-family: 'Oswald', 'Bebas Neue', sans-serif;
+    font-weight: 700;
+  }
   .hub__lede {
     max-width: 640px;
     font-size: 17px;
@@ -144,7 +154,7 @@
   .variant:hover .variant__cta::after { transform: translateX(6px); }
 
   /* Mini previews drawn in CSS */
-  .mini { position: absolute; inset: 0; padding: 16px; font-family: var(--font-head); letter-spacing: 0.02em; }
+  .mini { position: absolute; inset: 0; padding: 16px; font-family: 'Oswald', 'Bebas Neue', sans-serif; font-weight: 700; letter-spacing: 0.02em; }
 
   .mini--apex {
     background: oklch(0.10 0.01 250);
@@ -152,9 +162,10 @@
     align-items: flex-end;
   }
   .mini--apex .title {
-    font-size: 62px;
-    line-height: 0.85;
+    font-size: 52px;
+    line-height: 0.92;
     color: var(--fg);
+    text-transform: uppercase;
   }
   .mini--apex .title u { text-decoration: none; color: var(--accent); }
   .mini--apex::before {
@@ -199,16 +210,16 @@
   }
   .mini--paddock .stencil {
     position: relative;
-    font-size: 56px;
-    line-height: 0.85;
+    font-size: 44px;
+    line-height: 0.95;
     color: var(--fg);
     letter-spacing: 0.04em;
     padding-top: 20px;
+    text-transform: uppercase;
   }
   .mini--paddock .stencil u {
     text-decoration: none;
     display: block;
-    color: var(--accent);
     -webkit-text-stroke: 2px var(--accent);
     color: transparent;
   }
@@ -240,7 +251,7 @@
       DRIFT<b>.EG.JE</b>
     </a>
     <nav class="nav">
-      <a class="active" href="index.html">Index</a>
+      <a class="active" href="index.html">Variants</a>
       <a href="apex/home.html">Apex</a>
       <a href="telemetry/home.html">Telemetry</a>
       <a href="paddock/home.html">Paddock</a>
@@ -253,16 +264,16 @@
 
 <main class="hub">
   <div class="hub__meta">
-    <span>01 / Concept</span>
+    <span>Concept</span>
     <span>drift.eg.je</span>
-    <span><b>●</b> 3 directions</span>
+    <span><b>●</b> 3 variants</span>
     <span>2026</span>
   </div>
 
-  <h1><span>Three ways to make it</span><br><span>go</span> <span style="color:var(--accent)">sideways</span>.</h1>
+  <h1><span>Three website design variants.</span><br><span style="color:var(--accent)">Pick</span> <span>the one you like.</span></h1>
 
   <p class="hub__lede">
-    Redesign exploration for drift.eg.je. Same stack (vanilla JS + Fastify + Postgres) — different visual languages. Pick a direction, mix the best parts, or tweak live from the Tweaks panel.
+    Евгений Викторович, я подготовил три варианта дизайна портала drift.eg.je. Откройте каждый и посмотрите какой больше подходит по стилю. Наполнение одинаковое — данные о гонщиках, треках и услугах взяты из текущего сайта drift.eg.je.
   </p>
 
   <div class="variants">
@@ -271,17 +282,17 @@
       <span class="variant__num">01</span>
       <div class="variant__preview">
         <div class="mini mini--apex">
-          <div class="title">DRIFT<br><u>SIDE</u>WAYS</div>
+          <div class="title">DRIFT<br><u>JER</u>SEY</div>
         </div>
       </div>
       <div class="variant__body">
-        <div class="variant__tag">Brutalist typographic</div>
+        <div class="variant__tag">Large typography, minimal colour</div>
         <h3 class="variant__title">Apex</h3>
-        <p class="variant__desc">Giant headlines, negative space, a few loud accent moments. Type carries everything.</p>
+        <p class="variant__desc">Huge headlines, lots of air, rare orange accents. Reads like a magazine — letters hold the whole page.</p>
         <div class="variant__pages">
           <span>Home</span><span>Drivers</span><span>Calendar</span><span>Tracks</span><span>Shop</span>
         </div>
-        <span class="variant__cta">Enter Apex</span>
+        <span class="variant__cta">Open Apex</span>
       </div>
     </a>
 
@@ -289,20 +300,20 @@
       <span class="variant__num">02</span>
       <div class="variant__preview">
         <div class="mini mini--tele">
-          <div class="card">HP<b>480</b>E85 / VQ35</div>
-          <div class="card">ANGLE<b>62°</b>MAX LOCK</div>
-          <div class="card">TIME<b>47.12</b>QUALI BEST</div>
-          <div class="card">PTS<b>1280</b>SEASON</div>
+          <div class="card">HP<b>1249</b>Top car</div>
+          <div class="card">DRIVERS<b>24</b>in roster</div>
+          <div class="card">TRACKS<b>05</b>Florida</div>
+          <div class="card">SHOP<b>04</b>active</div>
         </div>
       </div>
       <div class="variant__body">
-        <div class="variant__tag">Editorial / data-dense</div>
+        <div class="variant__tag">Dense grid, like a pit-wall dashboard</div>
         <h3 class="variant__title">Telemetry</h3>
-        <p class="variant__desc">Magazine grid meets a pit wall data board. Dense, legible, every pilot reads like a dashboard.</p>
+        <p class="variant__desc">Like an F1 pit-wall: cards, numbers, tables. A lot of data on one screen — great for analytics.</p>
         <div class="variant__pages">
           <span>Home</span><span>Drivers</span><span>Calendar</span><span>Tracks</span><span>Shop</span>
         </div>
-        <span class="variant__cta">Enter Telemetry</span>
+        <span class="variant__cta">Open Telemetry</span>
       </div>
     </a>
 
@@ -310,25 +321,25 @@
       <span class="variant__num">03</span>
       <div class="variant__preview">
         <div class="mini mini--paddock">
-          <div class="stencil">NO<br><u>LIFT</u></div>
+          <div class="stencil">PIT<br><u>PADDOCK</u></div>
         </div>
       </div>
       <div class="variant__body">
-        <div class="variant__tag">Industrial / garage</div>
+        <div class="variant__tag">Racing-pit aesthetic</div>
         <h3 class="variant__title">Paddock</h3>
-        <p class="variant__desc">Warning tape, stencils, concrete textures. Feels like walking through a race team's garage.</p>
+        <p class="variant__desc">Signal tape, stencil lettering, concrete textures. Feels like stepping into the team's paddock after a practice session.</p>
         <div class="variant__pages">
           <span>Home</span><span>Drivers</span><span>Calendar</span><span>Tracks</span><span>Shop</span>
         </div>
-        <span class="variant__cta">Enter Paddock</span>
+        <span class="variant__cta">Open Paddock</span>
       </div>
     </a>
 
   </div>
 
   <footer class="hub__foot">
-    <span><b>drift.eg.je</b> — redesign exploration v0.1</span>
-    <span>Toggle <b>Tweaks</b> in toolbar to customize accent / motion / density</span>
+    <span>Евгений Викторович, выберите один из трёх вариантов — доведу до продакшена</span>
+    <span>Панель <b>Tweaks</b> справа внизу — попробуйте сменить акцент или анимацию</span>
   </footer>
 </main>
 

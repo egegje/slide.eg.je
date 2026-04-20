@@ -11,6 +11,23 @@
   --surface: oklch(0.20 0.012 55);
   --line: oklch(0.30 0.015 55);
   --line-strong: oklch(0.44 0.018 55);
+  --font-display: 'Oswald', 'Bebas Neue', 'Impact', sans-serif;
+}
+
+/* Russian-friendly display font overrides */
+.pad-hero__title,
+.pad-hero__cell b,
+.pad-section__head h2,
+.pad-section__head .num,
+.pad-crew__name,
+.pad-event__name,
+.pad-shop h3,
+.pad-footer h5,
+.pad-stamp__no,
+.pad-sticker,
+.pad-crew__specs b {
+  font-family: var(--font-display);
+  font-weight: 700;
 }
 
 /* Hazard strip top */
@@ -439,4 +456,244 @@
   .pad-hero__bottom { grid-template-columns: 1fr; gap: 20px; }
   .pad-stamp { display: none; }
   .pad-footer__grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Intro + instructional note */
+.pad-intro {
+  max-width: 760px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+  margin-bottom: 32px;
+}
+.pad-note {
+  padding: 28px;
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  margin-bottom: 32px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+}
+.pad-note b { color: var(--fg); }
+
+/* Crew card extras for country / titles */
+.pad-crew__country {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.pad-crew__titles {
+  font-size: 12px;
+  color: var(--fg-dim);
+  line-height: 1.5;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+
+/* Tracks */
+.pad-tracks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+@media (max-width: 720px) { .pad-tracks { grid-template-columns: 1fr; } }
+.pad-track {
+  position: relative;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: all .2s var(--ease);
+}
+.pad-track:hover { border-color: var(--accent); transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--accent); }
+.pad-track::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--accent);
+}
+.pad-track__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.pad-track__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.pad-track__lvl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--accent-ink);
+  background: var(--accent);
+  padding: 4px 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.pad-track__loc {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.pad-track__desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+  margin-bottom: 16px;
+}
+.pad-track__foot {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.pad-track__foot a { color: var(--accent); }
+
+/* Services */
+.pad-services {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+@media (max-width: 720px) { .pad-services { grid-template-columns: 1fr; } }
+.pad-service {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 28px;
+  transition: all .2s var(--ease);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pad-service:hover { border-color: var(--accent); box-shadow: 4px 4px 0 var(--accent); transform: translate(-2px, -2px); }
+.pad-service__tape {
+  position: absolute;
+  top: 14px; right: -8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 4px 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  transform: rotate(3deg);
+  text-transform: uppercase;
+}
+.pad-service__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  max-width: 72%;
+}
+.pad-service__short {
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 500;
+}
+.pad-service__long {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+}
+.pad-service__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+.pad-service__price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--fg);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+/* Mock event card */
+.pad-event--mock { opacity: 0.55; border-style: dashed; }
+.pad-event--mock::before { background: var(--line-strong); }
+.pad-event--mock .pad-event__date::before {
+  content: "ПРИМЕР · ";
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ============================================================
+   PADDOCK — mobile responsive
+   ============================================================ */
+
+@media (max-width: 820px) {
+  .pad-hero {
+    padding: 36px 18px;
+    grid-template-columns: 1fr !important;
+    gap: 18px;
+  }
+  .pad-hero__stencil { font-size: clamp(60px, 18vw, 120px); line-height: 0.9; }
+  .pad-hero__stamp { font-size: 22px; }
+  .pad-hero__cell { padding: 18px; }
+  .pad-hero__cell p { font-size: 14px; }
+
+  .pad-hazard { padding: 20px 18px; font-size: 12px; }
+
+  .pad-section { padding: 48px 18px; }
+  .pad-section__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .pad-section__head h2 { font-size: clamp(36px, 10vw, 56px); }
+
+  .pad-crew,
+  .pad-tracks,
+  .pad-services {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .pad-events { gap: 12px; }
+  .pad-event,
+  .pad-event--mock {
+    grid-template-columns: auto 1fr !important;
+    gap: 12px;
+    padding: 16px;
+  }
+  .pad-event__meta { font-size: 11px; }
+
+  .pad-footer { padding: 36px 18px; }
+  .pad-footer__grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .pad-stickers { display: none; }
+}
+
+@media (max-width: 480px) {
+  .pad-crew, .pad-tracks, .pad-services { gap: 10px; }
+  .pad-footer__grid { grid-template-columns: 1fr; }
 }

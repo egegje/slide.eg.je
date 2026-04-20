@@ -1,8 +1,25 @@
 /* TELEMETRY — editorial / data-dense */
 
+[data-variant="telemetry"] {
+  --font-display: 'Oswald', 'Bebas Neue', 'Impact', sans-serif;
+}
+
 .tele-body {
   background: var(--bg);
   overflow-x: hidden;
+}
+
+/* Russian-friendly display font overrides */
+.tele-card--feature h2,
+.tele-card--next h3,
+.tele-card--stat .big,
+.tele-section__head h2,
+.tele-driver__name,
+.tele-standings .pos,
+.tele-standings .name,
+.tele-footer h5 {
+  font-family: var(--font-display);
+  font-weight: 700;
 }
 
 /* Sub nav with data chips */
@@ -427,4 +444,269 @@
     grid-row: auto;
   }
   .tele-footer__grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Intro / note */
+.tele-intro {
+  max-width: 760px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+  margin-bottom: 24px;
+}
+.tele-note {
+  padding: 28px;
+  background: var(--surface);
+  border: 1px dashed var(--line-strong);
+  margin-bottom: 24px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+}
+.tele-note b { color: var(--fg); }
+
+/* Tracks */
+.tele-tracks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 720px) { .tele-tracks { grid-template-columns: 1fr; } }
+.tele-track {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all .2s var(--ease);
+}
+.tele-track:hover { border-color: var(--accent); }
+.tele-track__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.tele-track__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.tele-track__lvl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tele-track__rows {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tele-track__rows b {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--fg);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 2px;
+}
+.tele-track__desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+}
+.tele-track__links {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.tele-track__links a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+/* Services */
+.tele-services {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 720px) { .tele-services { grid-template-columns: 1fr; } }
+.tele-service {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all .2s var(--ease);
+}
+.tele-service:hover { border-color: var(--accent); }
+.tele-service__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.tele-service__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.tele-service__price {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tele-service__short {
+  font-size: 14px;
+  color: var(--fg);
+  font-weight: 500;
+}
+.tele-service__long {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+}
+.tele-service__foot {
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+/* Driver extended card (for full drivers page) */
+.tele-driver--full .tele-driver__img { aspect-ratio: 1/1; min-height: 160px; }
+.tele-driver__flag {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 22px;
+  z-index: 2;
+}
+.tele-driver__country {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+  text-transform: uppercase;
+  margin-top: -4px;
+}
+.tele-driver__titles {
+  font-size: 12px;
+  color: var(--fg-dim);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* Mock event card */
+.tele-event-mock {
+  border: 1px dashed var(--line-strong);
+  background: oklch(0.14 0.012 250);
+  padding: 18px;
+  opacity: 0.65;
+  position: relative;
+}
+.tele-event-mock::before {
+  content: "ПРИМЕР";
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 2px 6px;
+  margin-bottom: 10px;
+}
+.tele-event-mock h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  margin-bottom: 4px;
+}
+.tele-event-mock .when {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+.tele-events-mock {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 720px) { .tele-events-mock { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   TELEMETRY — mobile responsive
+   ============================================================ */
+
+@media (max-width: 820px) {
+  .tele-hero {
+    grid-template-columns: 1fr !important;
+    padding: 28px 18px;
+    gap: 16px;
+  }
+  .tele-hero__card { padding: 20px; }
+  .tele-hero__card h2 { font-size: clamp(28px, 7vw, 40px); }
+
+  .tele-subbar {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 18px;
+    font-size: 10px;
+  }
+
+  .tele-section { padding: 40px 18px; }
+  .tele-section__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .tele-section__head h2 { font-size: clamp(32px, 9vw, 48px); }
+
+  .tele-drivers,
+  .tele-tracks,
+  .tele-services {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+  .tele-driver, .tele-driver--full { padding: 16px; }
+
+  .tele-events-mock,
+  .tele-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .tele-footer { padding: 36px 18px; }
+  .tele-footer__grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+}
+
+@media (max-width: 480px) {
+  .tele-stats { grid-template-columns: 1fr; }
+  .tele-footer__grid { grid-template-columns: 1fr; }
 }
