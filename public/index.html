@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>drift.eg.je — redesign</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 50% 0%, oklch(0.22 0.03 55 / 0.4), transparent 60%),
+      var(--bg);
+  }
+  .hub {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 80px 40px 120px;
+    width: 100%;
+    flex: 1;
+  }
+  .hub__meta {
+    display: flex;
+    gap: 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+  .hub__meta b { color: var(--accent); }
+  .hub h1 {
+    font-family: var(--font-head);
+    font-size: clamp(60px, 9vw, 160px);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hub h1 span { color: var(--accent); }
+  :root[lang="ru"] .hub h1 { font-size: clamp(52px, 7.5vw, 128px); line-height: 1.05; }
+  .hub__lede {
+    max-width: 640px;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--fg-dim);
+    margin-bottom: 80px;
+  }
+  .variants {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 960px) {
+    .variants { grid-template-columns: 1fr; }
+  }
+  .variant {
+    position: relative;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    overflow: hidden;
+    transition: all .25s var(--ease);
+    display: flex;
+    flex-direction: column;
+  }
+  .variant:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+  .variant__num {
+    position: absolute;
+    top: 16px; right: 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    z-index: 2;
+  }
+  .variant__preview {
+    aspect-ratio: 4/3;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+  .variant__body {
+    padding: 24px;
+  }
+  .variant__tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .variant__title {
+    font-family: var(--font-head);
+    font-size: 38px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .variant__desc {
+    font-size: 14px;
+    color: var(--fg-dim);
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .variant__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .variant__pages span {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 3px 7px;
+    border: 1px solid var(--line);
+  }
+  .variant__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-head);
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .variant__cta::after {
+    content: "→";
+    transition: transform .15s var(--ease);
+  }
+  .variant:hover .variant__cta::after { transform: translateX(6px); }
+
+  /* Mini previews drawn in CSS */
+  .mini { position: absolute; inset: 0; padding: 16px; font-family: var(--font-head); letter-spacing: 0.02em; }
+
+  .mini--apex {
+    background: oklch(0.10 0.01 250);
+    display: flex;
+    align-items: flex-end;
+  }
+  .mini--apex .title {
+    font-size: 62px;
+    line-height: 0.85;
+    color: var(--fg);
+  }
+  .mini--apex .title u { text-decoration: none; color: var(--accent); }
+  .mini--apex::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg, oklch(0.14 0.01 250) 0 60px, transparent 60px 61px
+    );
+    opacity: 0.6;
+  }
+
+  .mini--tele {
+    background: oklch(0.15 0.01 250);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .mini--tele .card {
+    background: oklch(0.22 0.015 250);
+    border: 1px solid var(--line);
+    padding: 10px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--fg-dim);
+  }
+  .mini--tele .card b { display: block; color: var(--accent); font-size: 22px; font-family: var(--font-head); letter-spacing: 0.02em; }
+
+  .mini--paddock {
+    background: oklch(0.14 0.008 55);
+  }
+  .mini--paddock::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      135deg,
+      oklch(0.74 0.20 55) 0 18px,
+      oklch(0.14 0.01 55) 18px 36px
+    );
+    opacity: 0.25;
+  }
+  .mini--paddock .stencil {
+    position: relative;
+    font-size: 56px;
+    line-height: 0.85;
+    color: var(--fg);
+    letter-spacing: 0.04em;
+    padding-top: 20px;
+  }
+  .mini--paddock .stencil u {
+    text-decoration: none;
+    display: block;
+    color: var(--accent);
+    -webkit-text-stroke: 2px var(--accent);
+    color: transparent;
+  }
+
+  .hub__foot {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .hub__foot b { color: var(--fg-dim); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="index.html">
+      <svg class="monster-head" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="var(--accent)" stroke="none"/>
+        <path d="M9 14 L11 18 L13 14 M15 14 L17 18 L19 14" stroke="var(--bg)" stroke-width="2"/>
+      </svg>
+      DRIFT<b>.EG.JE</b>
+    </a>
+    <nav class="nav">
+      <a class="active" href="index.html" data-en="Index" data-ru="Обзор">Index</a>
+      <a href="apex/home.html" data-en="Apex" data-ru="Apex">Apex</a>
+      <a href="telemetry/home.html" data-en="Telemetry" data-ru="Телеметрия">Telemetry</a>
+      <a href="paddock/home.html" data-en="Paddock" data-ru="Паддок">Paddock</a>
+    </nav>
+    <div class="topbar__right">
+      <div class="lang">
+        <button data-lang-set="en" class="on">EN</button>
+        <button data-lang-set="ru">RU</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="hub">
+  <div class="hub__meta">
+    <span>01 / Concept</span>
+    <span>drift.eg.je</span>
+    <span><b>●</b> 3 directions</span>
+    <span>2026</span>
+  </div>
+
+  <h1><span data-en="Three ways to make it" data-ru="Три способа пустить">Three ways to make it</span><br><span data-en="go" data-ru="всё в">go</span> <span style="color:var(--accent)" data-en="sideways" data-ru="занос">sideways</span>.</h1>
+
+  <p class="hub__lede" data-en="Redesign exploration for drift.eg.je. Same stack (vanilla JS + Fastify + Postgres) — different visual languages. Pick a direction, mix the best parts, or tweak live from the Tweaks panel." data-ru="Исследование редизайна drift.eg.je. Тот же стек (vanilla JS + Fastify + Postgres) — разные визуальные языки. Выбери направление, смешай лучшее или правь вживую через панель Tweaks.">
+    Redesign exploration for drift.eg.je. Same stack (vanilla JS + Fastify + Postgres) — different visual languages. Pick a direction, mix the best parts, or tweak live from the Tweaks panel.
+  </p>
+
+  <div class="variants">
+
+    <a class="variant" href="apex/home.html">
+      <span class="variant__num">01</span>
+      <div class="variant__preview">
+        <div class="mini mini--apex">
+          <div class="title">DRIFT<br><u>SIDE</u>WAYS</div>
+        </div>
+      </div>
+      <div class="variant__body">
+        <div class="variant__tag" data-en="Brutalist typographic" data-ru="Брутальный типографический">Brutalist typographic</div>
+        <h3 class="variant__title">Apex</h3>
+        <p class="variant__desc" data-en="Giant headlines, negative space, a few loud accent moments. Type carries everything." data-ru="Гигантские заголовки, воздух, несколько громких акцентов. Вся работа на типографике.">Giant headlines, negative space, a few loud accent moments. Type carries everything.</p>
+        <div class="variant__pages">
+          <span>Home</span><span>Drivers</span><span>Calendar</span><span>Tracks</span><span>Shop</span>
+        </div>
+        <span class="variant__cta" data-en="Enter Apex" data-ru="Войти в Apex">Enter Apex</span>
+      </div>
+    </a>
+
+    <a class="variant" href="telemetry/home.html">
+      <span class="variant__num">02</span>
+      <div class="variant__preview">
+        <div class="mini mini--tele">
+          <div class="card">HP<b>480</b>E85 / VQ35</div>
+          <div class="card">ANGLE<b>62°</b>MAX LOCK</div>
+          <div class="card">TIME<b>47.12</b>QUALI BEST</div>
+          <div class="card">PTS<b>1280</b>SEASON</div>
+        </div>
+      </div>
+      <div class="variant__body">
+        <div class="variant__tag" data-en="Editorial / data-dense" data-ru="Редакционный / данные">Editorial / data-dense</div>
+        <h3 class="variant__title">Telemetry</h3>
+        <p class="variant__desc" data-en="Magazine grid meets a pit wall data board. Dense, legible, every pilot reads like a dashboard." data-ru="Журнальная сетка и пит-бокс-доска. Плотно, читаемо, каждый пилот — как приборка.">Magazine grid meets a pit wall data board. Dense, legible, every pilot reads like a dashboard.</p>
+        <div class="variant__pages">
+          <span>Home</span><span>Drivers</span><span>Calendar</span><span>Tracks</span><span>Shop</span>
+        </div>
+        <span class="variant__cta" data-en="Enter Telemetry" data-ru="Войти в Телеметрию">Enter Telemetry</span>
+      </div>
+    </a>
+
+    <a class="variant" href="paddock/home.html">
+      <span class="variant__num">03</span>
+      <div class="variant__preview">
+        <div class="mini mini--paddock">
+          <div class="stencil">NO<br><u>LIFT</u></div>
+        </div>
+      </div>
+      <div class="variant__body">
+        <div class="variant__tag" data-en="Industrial / garage" data-ru="Индустриальный / гараж">Industrial / garage</div>
+        <h3 class="variant__title">Paddock</h3>
+        <p class="variant__desc" data-en="Warning tape, stencils, concrete textures. Feels like walking through a race team's garage." data-ru="Сигнальная лента, трафарет, бетон. Как будто идёшь через гараж команды.">Warning tape, stencils, concrete textures. Feels like walking through a race team's garage.</p>
+        <div class="variant__pages">
+          <span>Home</span><span>Drivers</span><span>Calendar</span><span>Tracks</span><span>Shop</span>
+        </div>
+        <span class="variant__cta" data-en="Enter Paddock" data-ru="Войти в Паддок">Enter Paddock</span>
+      </div>
+    </a>
+
+  </div>
+
+  <footer class="hub__foot">
+    <span><b>drift.eg.je</b> — redesign exploration v0.1</span>
+    <span>Toggle <b>Tweaks</b> in toolbar to customize accent / motion / density</span>
+  </footer>
+</main>
+
+<!-- Tweaks panel -->
+<aside class="tweaks" id="tweaks">
+  <h4>Tweaks</h4>
+  <div class="tweaks__row">
+    <span>Accent</span>
+    <div class="tweaks__swatches">
+      <button data-tweak-accent="orange" class="tweaks__sw on" style="background: oklch(0.74 0.20 55)"></button>
+      <button data-tweak-accent="green" class="tweaks__sw" style="background: oklch(0.80 0.20 135)"></button>
+      <button data-tweak-accent="red" class="tweaks__sw" style="background: oklch(0.66 0.24 25)"></button>
+      <button data-tweak-accent="cyan" class="tweaks__sw" style="background: oklch(0.80 0.16 210)"></button>
+    </div>
+  </div>
+  <div class="tweaks__row">
+    <span>Density</span>
+    <div class="tweaks__select">
+      <button data-tweak-set="density:compact">Compact</button>
+      <button data-tweak-set="density:comfy" class="on">Comfy</button>
+    </div>
+  </div>
+  <div class="tweaks__row">
+    <span>Motion FX</span>
+    <div data-tweak-toggle="motion" class="tweaks__toggle on"></div>
+  </div>
+  <div class="tweaks__row">
+    <span>Hero style</span>
+    <div class="tweaks__select">
+      <button data-tweak-set="hero:video" class="on">Video</button>
+      <button data-tweak-set="hero:type">Type</button>
+      <button data-tweak-set="hero:map">Map</button>
+    </div>
+  </div>
+</aside>
+
+<script>
+window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
+  "accent": "orange",
+  "density": "comfy",
+  "motion": true,
+  "hero": "video",
+  "lang": "en"
+}/*EDITMODE-END*/;
+</script>
+<script src="shared.js"></script>
+
+</body>
+</html>
