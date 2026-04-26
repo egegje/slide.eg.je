@@ -188,16 +188,27 @@ const DASH_HTML = `<!doctype html>
   .group__title b { color: var(--fg); }
   .group__title span { font-size: 10px; }
 
-  .slot { display: grid; grid-template-columns: 56px 1fr; gap: 10px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: #0f0f13; cursor: pointer; transition: border-color .12s; margin-bottom: 6px; }
+  .slot { display: grid; grid-template-columns: 56px 1fr auto; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: #0f0f13; transition: border-color .12s, background .12s; margin-bottom: 6px; }
   .slot:hover { border-color: var(--line-2); }
   .slot.active { border-color: var(--accent); background: #1a1015; }
-  .slot__thumb { width: 56px; height: 56px; border-radius: 8px; background: #15151a center/cover no-repeat; border: 1px solid var(--line); position: relative; flex-shrink: 0; }
+  .slot.over { border-color: var(--accent); background: rgba(255,59,48,0.1); border-style: dashed; }
+  .slot__thumb { width: 56px; height: 56px; border-radius: 8px; background: #15151a center/cover no-repeat; border: 1px solid var(--line); position: relative; flex-shrink: 0; cursor: pointer; }
   .slot__thumb.empty::after { content: "+"; color: var(--muted); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-  .slot__body { min-width: 0; display: flex; flex-direction: column; gap: 2px; justify-content: center; }
+  .slot__body { min-width: 0; display: flex; flex-direction: column; gap: 2px; justify-content: center; cursor: pointer; }
   .slot__name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .slot__meta { color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .slot__status { font-size: 10px; color: var(--muted); margin-top: 2px; }
   .slot__status.has { color: var(--ok); }
+  .slot__act { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
+  .slot__pick { display: inline-block; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line); background: #1a1a20; color: var(--fg); cursor: pointer; font-size: 11px; text-align: center; white-space: nowrap; }
+  .slot__pick:hover { border-color: var(--accent); background: #20141a; }
+  .slot__pick input { display: none; }
+  .slot__del { padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); background: #1a1a20; color: var(--accent); cursor: pointer; font-size: 11px; }
+  .slot__del:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  .slot__bar { grid-column: 1 / -1; height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; display: none; }
+  .slot__bar.show { display: block; }
+  .slot__bar > i { display: block; height: 100%; background: var(--accent); width: 0%; transition: width .15s, background .25s; }
+  .slot__bar.done > i { background: var(--ok); }
 
   .editor { padding: 14px; border: 1px solid var(--accent); border-radius: 12px; background: #14080a; margin-bottom: 14px; }
   .editor h3 { margin: 0 0 4px; font-size: 14px; }
@@ -313,6 +324,9 @@ const DASH_HTML = `<!doctype html>
     if (newPage !== state.page) { state.page = newPage; refreshFrame(); }
     else { highlightInFrame(slotId); }
     renderRail();
+    // Scroll rail to top so the editor pane (for hero text fields) is visible.
+    const rail = document.getElementById('rail');
+    if (rail) rail.scrollTop = 0;
   }
 
   function highlightInFrame(slotId) {
@@ -367,13 +381,22 @@ const DASH_HTML = `<!doctype html>
   function renderSlot(id, name, meta, hasPhoto, photoUrl) {
     const isActive = state.activeSlot === id;
     const thumbStyle = photoUrl ? 'background-image:url(' + escHtml(photoUrl) + '?v=' + Date.now() + ')' : '';
-    return '<div class="slot ' + (isActive ? 'active' : '') + '" onclick="selectSlot(\\'' + id + '\\')">' +
-      '<div class="slot__thumb' + (hasPhoto ? '' : ' empty') + '" style="' + thumbStyle + '"></div>' +
-      '<div class="slot__body">' +
+    const pickLabel = hasPhoto ? 'Заменить' : 'Загрузить';
+    return '<div class="slot ' + (isActive ? 'active' : '') + '" data-slotid="' + id + '" ' +
+        'ondragover="onSlotDragOver(event,this)" ondragleave="onSlotDragLeave(this)" ondrop="onSlotDrop(event,\\'' + id + '\\')">' +
+      '<div class="slot__thumb' + (hasPhoto ? '' : ' empty') + '" style="' + thumbStyle + '" onclick="selectSlot(\\'' + id + '\\')"></div>' +
+      '<div class="slot__body" onclick="selectSlot(\\'' + id + '\\')">' +
         '<div class="slot__name">' + escHtml(name) + '</div>' +
         '<div class="slot__meta">' + escHtml(meta || '') + '</div>' +
         '<div class="slot__status ' + (hasPhoto ? 'has' : '') + '">' + (hasPhoto ? '✓ фото загружено' : 'фото не загружено') + '</div>' +
       '</div>' +
+      '<div class="slot__act">' +
+        '<label class="slot__pick">' + pickLabel +
+          '<input type="file" accept="image/*" onchange="uploadFromSlot(\\'' + id + '\\', this)">' +
+        '</label>' +
+        (hasPhoto ? '<button class="slot__del" onclick="deleteFromSlot(\\'' + id + '\\')">×</button>' : '') +
+      '</div>' +
+      '<div class="slot__bar"><i></i></div>' +
     '</div>';
   }
 
@@ -425,34 +448,67 @@ const DASH_HTML = `<!doctype html>
     '</div>';
   }
 
+  function uploadFile(slotId, file, barEl) {
+    return new Promise((resolve) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('slot', slotId);
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/admin/api/upload-slot');
+      const inner = barEl ? barEl.querySelector('i') : null;
+      if (barEl) { barEl.classList.add('show'); barEl.classList.remove('done'); if (inner) inner.style.width = '0%'; }
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && inner) inner.style.width = ((e.loaded / e.total) * 100) + '%';
+      };
+      xhr.onload = async () => {
+        if (xhr.status === 200) {
+          if (inner) inner.style.width = '100%';
+          if (barEl) barEl.classList.add('done');
+          toast('Фото загружено');
+          await loadAll();
+          refreshFrame();
+          resolve(true);
+        } else {
+          toast('Ошибка: ' + xhr.status + ' ' + xhr.responseText);
+          if (barEl) barEl.classList.remove('show');
+          resolve(false);
+        }
+      };
+      xhr.onerror = () => {
+        toast('Сетевая ошибка');
+        if (barEl) barEl.classList.remove('show');
+        resolve(false);
+      };
+      xhr.send(fd);
+    });
+  }
+
+  async function uploadFromSlot(slotId, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const slotEl = document.querySelector('.slot[data-slotid="' + slotId + '"]');
+    const bar = slotEl ? slotEl.querySelector('.slot__bar') : null;
+    await uploadFile(slotId, file, bar);
+  }
+
+  async function deleteFromSlot(slotId) {
+    if (!confirm('Удалить фото?')) return;
+    await api('/admin/api/delete-slot', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ slot: slotId }),
+    });
+    await loadAll();
+    refreshFrame();
+  }
+
+  // The legacy editor-pane upload path (still used by hero) routes to the
+  // same upload primitive so the single source of truth is uploadFile().
   async function uploadSlot(input) {
     const file = input.files[0]; if (!file) return;
     const id = state.activeSlot;
     const bar = document.getElementById('progress');
-    bar.classList.add('show');
-    const inner = bar.querySelector('i');
-    inner.style.width = '0%'; bar.classList.remove('done');
-
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('slot', id);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/admin/api/upload-slot');
-    xhr.upload.onprogress = (e) => { if (e.lengthComputable) inner.style.width = ((e.loaded/e.total)*100) + '%'; };
-    xhr.onload = async () => {
-      if (xhr.status === 200) {
-        inner.style.width = '100%'; bar.classList.add('done');
-        toast('Фото загружено');
-        await loadAll();
-        refreshFrame();
-      } else {
-        toast('Ошибка: ' + xhr.status + ' ' + xhr.responseText);
-        bar.classList.remove('show');
-      }
-    };
-    xhr.onerror = () => { toast('Сетевая ошибка'); bar.classList.remove('show'); };
-    xhr.send(fd);
+    await uploadFile(id, file, bar);
   }
 
   async function deleteSlot() {
@@ -464,6 +520,23 @@ const DASH_HTML = `<!doctype html>
     });
     await loadAll();
     refreshFrame();
+  }
+
+  function onSlotDragOver(e, el) {
+    e.preventDefault();
+    if (e.dataTransfer && Array.from(e.dataTransfer.items || []).some((it) => it.kind === 'file')) {
+      el.classList.add('over');
+    }
+  }
+  function onSlotDragLeave(el) { el.classList.remove('over'); }
+  async function onSlotDrop(e, slotId) {
+    e.preventDefault();
+    const slotEl = document.querySelector('.slot[data-slotid="' + slotId + '"]');
+    if (slotEl) slotEl.classList.remove('over');
+    const files = e.dataTransfer && e.dataTransfer.files;
+    if (!files || !files[0]) return;
+    const bar = slotEl ? slotEl.querySelector('.slot__bar') : null;
+    await uploadFile(slotId, files[0], bar);
   }
 
   async function saveHeroFields() {
