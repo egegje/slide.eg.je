@@ -184,9 +184,21 @@ const DASH_HTML = `<!doctype html>
   .frame { width: 100%; height: 100%; border: 0; background: var(--bg); }
 
   .group { margin-bottom: 14px; }
-  .group__title { font-size: 11px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin: 8px 0 8px; padding: 0 4px; display: flex; justify-content: space-between; align-items: baseline; }
+  .group__title { font-size: 11px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin: 8px 0 8px; padding: 0 4px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .group__title b { color: var(--fg); }
   .group__title span { font-size: 10px; }
+  .group__add { font-size: 11px; letter-spacing: 0.06em; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--line); background: #1a1a20; color: var(--fg); cursor: pointer; }
+  .group__add:hover { border-color: var(--accent); color: var(--accent); }
+  .new-form { padding: 12px; border: 1px solid var(--accent); border-radius: 10px; background: #14080a; margin-bottom: 8px; }
+  .new-form h4 { margin: 0 0 10px; font-size: 13px; }
+  .new-form .row { margin-bottom: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .new-form .row.full { grid-template-columns: 1fr; }
+  .new-form input { width: 100%; padding: 7px 10px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; color: var(--fg); font: inherit; font-size: 12px; }
+  .new-form input:focus { outline: none; border-color: var(--accent); }
+  .new-form label { font-size: 10px; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .new-form .actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 6px; }
+  .new-form button { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--line); background: #1a1a20; color: var(--fg); cursor: pointer; font-size: 12px; }
+  .new-form button.primary { background: var(--accent); color: white; border-color: var(--accent); }
 
   .slot { display: grid; grid-template-columns: 56px 1fr auto; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: #0f0f13; transition: border-color .12s, background .12s; margin-bottom: 6px; }
   .slot:hover { border-color: var(--line-2); }
@@ -273,6 +285,7 @@ const DASH_HTML = `<!doctype html>
     variant: 'apex',
     page: 'home',
     activeSlot: null,
+    newForm: null, // null | 'driver' | 'track' — controls which inline form is open
     drivers: [],
     tracks: [],
     eventPoster: null,
@@ -357,19 +370,125 @@ const DASH_HTML = `<!doctype html>
     const editor = state.activeSlot ? renderEditor() : '';
     const heroSlot = renderSlot('hero', 'Афиша главной', heroSubtitle(), state.eventPoster && state.eventPoster.photo, state.eventPoster && state.eventPoster.photo);
     const driverSlots = state.drivers.map((d) =>
-      renderSlot('driver-' + d.rank, '#' + d.rank + ' · ' + (d.name || ''), (d.car || '') + ' · ' + (d.hp || '') + ' HP', !!d.photo, d.photo)
+      renderSlot('driver-' + d.rank, '#' + d.rank + ' · ' + (d.name || ''), (d.car || '') + ' · ' + (d.hp || '') + ' HP', !!d.photo, d.photo, 'driver', d.rank)
     ).join('');
     const trackSlots = state.tracks.map((t) =>
-      renderSlot('track-' + t.slug, t.name, [t.city, t.region].filter(Boolean).join(', '), !!t.photo, t.photo)
+      renderSlot('track-' + t.slug, t.name, [t.city, t.region].filter(Boolean).join(', '), !!t.photo, t.photo, 'track', t.slug)
     ).join('');
     const gallerySection = renderGallerySection();
+
+    const driverNew = state.newForm === 'driver' ? renderDriverForm() : '';
+    const trackNew = state.newForm === 'track' ? renderTrackForm() : '';
 
     rail.innerHTML =
       editor +
       '<div class="group"><div class="group__title"><b>Афиша ивента</b><span>1 слот</span></div>' + heroSlot + '</div>' +
-      '<div class="group"><div class="group__title"><b>Пилоты</b><span>' + state.drivers.length + ' слотов</span></div>' + driverSlots + '</div>' +
-      '<div class="group"><div class="group__title"><b>Трассы</b><span>' + state.tracks.length + ' слотов</span></div>' + trackSlots + '</div>' +
+      '<div class="group">' +
+        '<div class="group__title"><b>Пилоты</b><span>' + state.drivers.length + '</span>' +
+          '<button class="group__add" onclick="toggleNewForm(\\'driver\\')">+ Добавить</button>' +
+        '</div>' + driverNew + driverSlots +
+      '</div>' +
+      '<div class="group">' +
+        '<div class="group__title"><b>Трассы</b><span>' + state.tracks.length + '</span>' +
+          '<button class="group__add" onclick="toggleNewForm(\\'track\\')">+ Добавить</button>' +
+        '</div>' + trackNew + trackSlots +
+      '</div>' +
       '<div class="group"><div class="group__title"><b>Галерея</b><span>' + state.gallery.length + ' файлов</span></div>' + gallerySection + '</div>';
+  }
+
+  function toggleNewForm(kind) {
+    state.newForm = state.newForm === kind ? null : kind;
+    renderRail();
+  }
+
+  function renderDriverForm() {
+    return '<div class="new-form">' +
+      '<h4>Новый пилот</h4>' +
+      '<div class="row full"><div><label>Имя</label><input id="nf-name" placeholder="James Deane"></div></div>' +
+      '<div class="row"><div><label>Страна</label><input id="nf-country" placeholder="Ирландия"></div>' +
+                       '<div><label>Флаг (emoji)</label><input id="nf-flag" placeholder="🇮🇪"></div></div>' +
+      '<div class="row full"><div><label>Машина</label><input id="nf-car" placeholder="Ford Mustang RTR"></div></div>' +
+      '<div class="row"><div><label>Двигатель</label><input id="nf-engine" placeholder="455ci V8"></div>' +
+                       '<div><label>Мощность (HP)</label><input id="nf-hp" type="number" placeholder="1249"></div></div>' +
+      '<div class="row full"><div><label>Instagram (опц.)</label><input id="nf-instagram" placeholder="@..."></div></div>' +
+      '<div class="actions">' +
+        '<button onclick="toggleNewForm(\\'driver\\')">Отмена</button>' +
+        '<button class="primary" onclick="createDriver()">Добавить</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderTrackForm() {
+    return '<div class="new-form">' +
+      '<h4>Новая трасса</h4>' +
+      '<div class="row full"><div><label>Название</label><input id="nf-tname" placeholder="Orlando Speed World"></div></div>' +
+      '<div class="row"><div><label>Город</label><input id="nf-tcity" placeholder="Orlando"></div>' +
+                       '<div><label>Страна</label><input id="nf-tcountry" placeholder="USA"></div></div>' +
+      '<div class="row"><div><label>Регион</label><input id="nf-tregion" placeholder="Florida"></div>' +
+                       '<div><label>Уровень</label><input id="nf-tlevel" placeholder="pro / pro-am / amateur"></div></div>' +
+      '<div class="row full"><div><label>Описание (опц.)</label><input id="nf-tdesc" placeholder="Coротко о трассе"></div></div>' +
+      '<div class="row full"><div><label>Google Maps URL (опц.)</label><input id="nf-tmaps" placeholder="https://maps.app.goo.gl/..."></div></div>' +
+      '<div class="actions">' +
+        '<button onclick="toggleNewForm(\\'track\\')">Отмена</button>' +
+        '<button class="primary" onclick="createTrack()">Добавить</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  async function createDriver() {
+    const body = {
+      name: document.getElementById('nf-name').value.trim(),
+      country: document.getElementById('nf-country').value.trim(),
+      flag: document.getElementById('nf-flag').value.trim(),
+      car: document.getElementById('nf-car').value.trim(),
+      engine: document.getElementById('nf-engine').value.trim(),
+      hp: document.getElementById('nf-hp').value.trim(),
+      instagram: document.getElementById('nf-instagram').value.trim(),
+    };
+    if (!body.name || !body.country) { toast('Имя и страна обязательны'); return; }
+    const r = await fetch('/admin/api/drivers', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) { toast('Ошибка: ' + r.status); return; }
+    state.newForm = null;
+    toast('Пилот добавлен — теперь можно загрузить фото');
+    await loadAll();
+    refreshFrame();
+  }
+
+  async function createTrack() {
+    const body = {
+      name: document.getElementById('nf-tname').value.trim(),
+      city: document.getElementById('nf-tcity').value.trim(),
+      country: document.getElementById('nf-tcountry').value.trim(),
+      region: document.getElementById('nf-tregion').value.trim(),
+      level: document.getElementById('nf-tlevel').value.trim(),
+      description: document.getElementById('nf-tdesc').value.trim(),
+      mapsUrl: document.getElementById('nf-tmaps').value.trim(),
+    };
+    if (!body.name) { toast('Название обязательно'); return; }
+    const r = await fetch('/admin/api/tracks', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) { toast('Ошибка: ' + r.status); return; }
+    state.newForm = null;
+    toast('Трасса добавлена');
+    await loadAll();
+    refreshFrame();
+  }
+
+  async function deleteEntity(kind, id) {
+    if (!confirm('Удалить ' + (kind === 'driver' ? 'пилота' : 'трассу') + ' полностью? (Не только фото.)')) return;
+    const r = await fetch('/admin/api/' + (kind === 'driver' ? 'drivers/' + id : 'tracks/' + encodeURIComponent(id)), {
+      method: 'DELETE', credentials: 'same-origin',
+    });
+    if (!r.ok) { toast('Ошибка: ' + r.status); return; }
+    await loadAll();
+    refreshFrame();
   }
 
   function heroSubtitle() {
@@ -378,10 +497,13 @@ const DASH_HTML = `<!doctype html>
     return 'не заполнена';
   }
 
-  function renderSlot(id, name, meta, hasPhoto, photoUrl) {
+  function renderSlot(id, name, meta, hasPhoto, photoUrl, entityKind, entityId) {
     const isActive = state.activeSlot === id;
     const thumbStyle = photoUrl ? 'background-image:url(' + escHtml(photoUrl) + '?v=' + Date.now() + ')' : '';
     const pickLabel = hasPhoto ? 'Заменить' : 'Загрузить';
+    const removeBtn = (entityKind && entityId !== undefined)
+      ? '<button class="slot__del" title="Удалить целиком" onclick="deleteEntity(\\'' + entityKind + '\\',\\'' + entityId + '\\')">✕</button>'
+      : (hasPhoto ? '<button class="slot__del" title="Удалить фото" onclick="deleteFromSlot(\\'' + id + '\\')">×</button>' : '');
     return '<div class="slot ' + (isActive ? 'active' : '') + '" data-slotid="' + id + '" ' +
         'ondragover="onSlotDragOver(event,this)" ondragleave="onSlotDragLeave(this)" ondrop="onSlotDrop(event,\\'' + id + '\\')">' +
       '<div class="slot__thumb' + (hasPhoto ? '' : ' empty') + '" style="' + thumbStyle + '" onclick="selectSlot(\\'' + id + '\\')"></div>' +
@@ -394,7 +516,7 @@ const DASH_HTML = `<!doctype html>
         '<label class="slot__pick">' + pickLabel +
           '<input type="file" accept="image/*" onchange="uploadFromSlot(\\'' + id + '\\', this)">' +
         '</label>' +
-        (hasPhoto ? '<button class="slot__del" onclick="deleteFromSlot(\\'' + id + '\\')">×</button>' : '') +
+        removeBtn +
       '</div>' +
       '<div class="slot__bar"><i></i></div>' +
     '</div>';
@@ -698,6 +820,96 @@ app.post("/admin/api/delete-slot", { preHandler: requireAuth }, async (req, repl
     await unlink(join(PUB, slot.target.photo)).catch(() => {});
   }
   slot.target.photo = null;
+  await writeJson(DRIFT_DATA, data);
+  await syncDriftDataJs(data);
+  return { ok: true };
+});
+
+app.post("/admin/api/drivers", { preHandler: requireAuth }, async (req, reply) => {
+  const b = req.body ?? {};
+  const name = String(b.name || "").trim();
+  const country = String(b.country || "").trim();
+  if (!name || !country) return reply.code(400).send({ error: "name and country required" });
+  const data = await readJson(DRIFT_DATA, {});
+  if (!Array.isArray(data.drivers)) data.drivers = [];
+  const nextRank = data.drivers.length ? Math.max(...data.drivers.map((d) => d.rank || 0)) + 1 : 1;
+  const driver = {
+    rank: nextRank,
+    name: name.slice(0, 80),
+    flag: b.flag ? String(b.flag).slice(0, 16) : null,
+    country: country.slice(0, 80),
+    car: b.car ? String(b.car).slice(0, 120) : "",
+    engine: b.engine ? String(b.engine).slice(0, 80) : "",
+    hp: b.hp ? Number(b.hp) || 0 : 0,
+    boost: null, diff: null, tires: null,
+    titles: [], tags: [], category: "world",
+    photo: null,
+    instagram: b.instagram ? String(b.instagram).slice(0, 80) : null,
+  };
+  data.drivers.push(driver);
+  await writeJson(DRIFT_DATA, data);
+  await syncDriftDataJs(data);
+  return driver;
+});
+
+app.delete("/admin/api/drivers/:rank", { preHandler: requireAuth }, async (req, reply) => {
+  const rank = parseInt(req.params.rank, 10);
+  if (!Number.isFinite(rank)) return reply.code(400).send({ error: "bad rank" });
+  const data = await readJson(DRIFT_DATA, {});
+  const idx = (data.drivers || []).findIndex((x) => x.rank === rank);
+  if (idx === -1) return reply.code(404).send({ error: "not found" });
+  const dr = data.drivers[idx];
+  if (dr.photo && dr.photo.startsWith("/photos/drivers/")) {
+    await unlink(join(PUB, dr.photo)).catch(() => {});
+  }
+  data.drivers.splice(idx, 1);
+  await writeJson(DRIFT_DATA, data);
+  await syncDriftDataJs(data);
+  return { ok: true };
+});
+
+app.post("/admin/api/tracks", { preHandler: requireAuth }, async (req, reply) => {
+  const b = req.body ?? {};
+  const name = String(b.name || "").trim();
+  if (!name) return reply.code(400).send({ error: "name required" });
+  const data = await readJson(DRIFT_DATA, {});
+  if (!Array.isArray(data.tracks)) data.tracks = [];
+  // Slug from name: lowercase ASCII-ish, fall back to timestamp if collision
+  const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "track";
+  let slug = baseSlug, i = 1;
+  while (data.tracks.some((x) => x.slug === slug)) { slug = `${baseSlug}-${i++}`; }
+  const track = {
+    name: name.slice(0, 120),
+    slug,
+    country: b.country ? String(b.country).slice(0, 80) : "",
+    region: b.region ? String(b.region).slice(0, 80) : "",
+    city: b.city ? String(b.city).slice(0, 80) : "",
+    address: null,
+    series: [],
+    level: b.level ? String(b.level).slice(0, 32) : "",
+    type: null,
+    description: b.description ? String(b.description).slice(0, 400) : "",
+    website: null,
+    mapsUrl: b.mapsUrl ? String(b.mapsUrl).slice(0, 400) : null,
+    photo: null,
+  };
+  data.tracks.push(track);
+  await writeJson(DRIFT_DATA, data);
+  await syncDriftDataJs(data);
+  return track;
+});
+
+app.delete("/admin/api/tracks/:slug", { preHandler: requireAuth }, async (req, reply) => {
+  const slug = req.params.slug;
+  if (!slug) return reply.code(400).send({ error: "bad slug" });
+  const data = await readJson(DRIFT_DATA, {});
+  const idx = (data.tracks || []).findIndex((x) => x.slug === slug);
+  if (idx === -1) return reply.code(404).send({ error: "not found" });
+  const tr = data.tracks[idx];
+  if (tr.photo && tr.photo.startsWith("/photos/tracks/")) {
+    await unlink(join(PUB, tr.photo)).catch(() => {});
+  }
+  data.tracks.splice(idx, 1);
   await writeJson(DRIFT_DATA, data);
   await syncDriftDataJs(data);
   return { ok: true };
