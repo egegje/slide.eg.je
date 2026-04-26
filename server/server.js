@@ -189,6 +189,7 @@ const DASH_HTML = `<!doctype html>
   .group__title span { font-size: 10px; }
   .group__add { font-size: 11px; letter-spacing: 0.06em; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--line); background: #1a1a20; color: var(--fg); cursor: pointer; }
   .group__add:hover { border-color: var(--accent); color: var(--accent); }
+  .group__hint { font-size: 11px; color: var(--muted); padding: 0 4px 8px; line-height: 1.4; }
   .new-form { padding: 12px; border: 1px solid var(--accent); border-radius: 10px; background: #14080a; margin-bottom: 8px; }
   .new-form h4 { margin: 0 0 10px; font-size: 13px; }
   .new-form .row { margin-bottom: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -384,18 +385,30 @@ const DASH_HTML = `<!doctype html>
 
     rail.innerHTML =
       editor +
-      '<div class="group"><div class="group__title"><b>Афиша ивента</b><span>1 слот</span></div>' + heroSlot + '</div>' +
+      '<div class="group">' +
+        '<div class="group__title"><b>Афиша ивента</b><span>1 слот</span></div>' +
+        '<div class="group__hint">' + escHtml(SPECS.hero.label + ' · от ' + SPECS.hero.min + ' · до ' + SPECS.hero.max) + '</div>' +
+        heroSlot +
+      '</div>' +
       '<div class="group">' +
         '<div class="group__title"><b>Пилоты</b><span>' + state.drivers.length + '</span>' +
           '<button class="group__add" onclick="toggleNewForm(\\'driver\\')">+ Добавить</button>' +
-        '</div>' + driverNew + driverSlots +
+        '</div>' +
+        '<div class="group__hint">' + escHtml(SPECS.driver.label + ' · от ' + SPECS.driver.min + ' · до ' + SPECS.driver.max) + '</div>' +
+        driverNew + driverSlots +
       '</div>' +
       '<div class="group">' +
         '<div class="group__title"><b>Трассы</b><span>' + state.tracks.length + '</span>' +
           '<button class="group__add" onclick="toggleNewForm(\\'track\\')">+ Добавить</button>' +
-        '</div>' + trackNew + trackSlots +
+        '</div>' +
+        '<div class="group__hint">' + escHtml(SPECS.track.label + ' · от ' + SPECS.track.min + ' · до ' + SPECS.track.max) + '</div>' +
+        trackNew + trackSlots +
       '</div>' +
-      '<div class="group"><div class="group__title"><b>Галерея</b><span>' + state.gallery.length + ' файлов</span></div>' + gallerySection + '</div>';
+      '<div class="group">' +
+        '<div class="group__title"><b>Галерея</b><span>' + state.gallery.length + ' файлов</span></div>' +
+        '<div class="group__hint">' + escHtml(SPECS.gallery.note + ' · ' + SPECS.gallery.max) + '</div>' +
+        gallerySection +
+      '</div>';
   }
 
   function toggleNewForm(kind) {
