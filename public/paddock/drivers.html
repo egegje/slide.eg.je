@@ -42,10 +42,6 @@
     <span class="meta">24 IN ROSTER<br>WORLD + RU</span>
   </div>
 
-  <p class="pad-intro">
-    Евгений Викторович, это все 24 гонщика которых я взял с drift.eg.je — мировой топ Formula Drift и D1GP плюс ключевые российские пилоты. На каждой карточке — страна, машина, двигатель, мощность и титулы.
-  </p>
-
   <div class="pad-crew" id="crew-grid"></div>
 </section>
 
@@ -79,9 +75,9 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
     var tape = (d.tags || []).indexOf('champion') >= 0 ? 'CHAMPION' : 'PRO';
     var titles = (d.titles || []).slice(0, 2).map(esc).join(' · ');
     return '' +
-      '<div class="pad-crew__card">' +
+      '<div class="pad-crew__card" data-slot="driver-' + esc(d.rank) + '">' +
         '<div class="pad-crew__img">' +
-          '<div class="ph" data-label="' + esc(d.country) + '"></div>' +
+          '<div class="ph' + (d.photo ? ' has-photo' : '') + '"' + (d.photo ? ' style="background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center"' : '') + ' data-label="' + esc(d.country) + '"></div>' +
           '<span class="pad-crew__tape">' + esc(tape) + '</span>' +
           '<span class="pad-crew__num">' + esc(num) + '</span>' +
         '</div>' +

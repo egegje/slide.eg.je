@@ -53,24 +53,22 @@
 <!-- HERO GRID -->
 <section class="tele-hero">
 
-  <div class="tele-card tele-card--feature">
+  <div class="tele-card tele-card--feature" id="tele-hero-feature" data-slot="hero">
     <div class="ph" data-label="POSTER SLOT"></div>
     <div class="overlay">
       <div class="tele-card__label"><span><b>01</b> HERO BLOCK</span><span>LAYOUT</span></div>
-      <h2><span>Евгений Викторович,</span> <span style="color:var(--accent)">сюда</span> <span>— афиша ближайшего ивента</span></h2>
-      <p>Это заглавный блок варианта Telemetry — большой, с картинкой на фон. Сюда можно поставить афишу ближайшего этапа, ссылку на регистрацию и короткий анонс.</p>
-      <div class="meta">
-        <span><b>STYLE</b> / DATA</span>
-        <span>DENSE GRID</span>
-        <span>DRAFT 01</span>
+      <h2 id="tele-hero-title">—</h2>
+      <p id="tele-hero-sub">—</p>
+      <div class="meta" id="tele-hero-meta">
+        <span><b>EVENT</b></span>
       </div>
     </div>
   </div>
 
-  <div class="tele-card tele-card--next">
-    <div class="tele-card__label"><span><b>02</b> NEXT EVENT</span><span>—</span></div>
-    <h3>Poster goes<br>here</h3>
-    <div class="when">Когда добавите событие через админку drift.eg.je</div>
+  <div class="tele-card tele-card--next" id="tele-next-event">
+    <div class="tele-card__label"><span><b>02</b> NEXT EVENT</span><span id="tele-next-track">—</span></div>
+    <h3 id="tele-next-title">—</h3>
+    <div class="when" id="tele-next-when">Скоро</div>
     <div class="countdown">
       <div><b>—</b><span>DAYS</span></div>
       <div><b>—</b><span>HRS</span></div>
@@ -111,10 +109,6 @@
     <a class="btn" href="drivers.html">All 24 →</a>
   </div>
 
-  <p class="tele-intro">
-    Евгений Викторович, это первая четвёрка из базы drift.eg.je — в таком виде карточки будут на главной. На странице Пилоты — все 24.
-  </p>
-
   <div class="tele-drivers" id="drivers-top"></div>
 </section>
 
@@ -128,9 +122,6 @@
     <a class="btn" href="calendar.html">Open calendar →</a>
   </div>
 
-  <div class="tele-note">
-    <b>Евгений Викторович,</b> здесь будут события сезона. Пока календарь не заполнен — вы сможете добавлять даты и трассы через админку drift.eg.je. Формат: дата, название, трасса, статус регистрации.
-  </div>
 </section>
 
 <!-- FOOTER -->
@@ -175,8 +166,8 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
   host.innerHTML = top.map(function (d) {
     var num = String(d.rank).padStart(2, '0');
     return '' +
-      '<div class="tele-driver">' +
-        '<div class="tele-driver__img"><div class="ph" data-label="' + esc(num) + '"></div><div class="num">' + esc(num) + '</div></div>' +
+      '<div class="tele-driver" data-slot="driver-' + esc(d.rank) + '">' +
+        '<div class="tele-driver__img"><div class="ph' + (d.photo ? ' has-photo' : '') + '"' + (d.photo ? ' style="background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center"' : '') + ' data-label="' + esc(num) + '"></div><div class="num">' + esc(num) + '</div></div>' +
         '<div class="tele-driver__body">' +
           '<div class="tele-driver__name">' + esc(d.name) + '</div>' +
           '<div class="tele-driver__car">' + esc(d.car) + '</div>' +
@@ -188,6 +179,26 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
         '</div>' +
       '</div>';
   }).join('');
+
+  var ep = data.eventPoster || {};
+  var feat = document.getElementById('tele-hero-feature');
+  if (feat) {
+    var phEl = feat.querySelector('.ph');
+    if (ep.photo && phEl) {
+      phEl.classList.add('has-photo');
+      phEl.style.backgroundImage = "url('" + ep.photo + "')";
+    }
+    var t = document.getElementById('tele-hero-title');
+    var s = document.getElementById('tele-hero-sub');
+    if (t) t.textContent = ep.title || 'Афиша скоро';
+    if (s) s.textContent = ep.date && ep.track ? (ep.date + ' · ' + ep.track) : (ep.date || ep.track || '');
+  }
+  var nt = document.getElementById('tele-next-title');
+  var nw = document.getElementById('tele-next-when');
+  var nk = document.getElementById('tele-next-track');
+  if (nt) nt.innerHTML = esc(ep.title || '—');
+  if (nw) nw.textContent = ep.date || '';
+  if (nk) nk.textContent = ep.track || '—';
 })();
 </script>
 </body>

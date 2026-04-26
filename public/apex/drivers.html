@@ -45,10 +45,6 @@
     </div>
   </div>
 
-  <p class="apex-intro">
-    Евгений Викторович, это все 24 гонщика которых я взял с drift.eg.je — мировой топ Formula Drift и D1GP плюс ключевые российские пилоты. На карточке — машина, двигатель, мощность и титулы. Если нужно добавить или убрать кого-то — через админку drift.eg.je.
-  </p>
-
   <div class="apex-drivers" id="drivers-grid"></div>
 </section>
 
@@ -84,7 +80,7 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
     var first = parts.join(' ');
     return '' +
       '<div class="apex-driver">' +
-        '<div class="ph" style="position:absolute;inset:0" data-label="' + esc(d.country) + '"></div>' +
+        '<div class="ph' + (d.photo ? ' has-photo' : '') + '" style="position:absolute;inset:0' + (d.photo ? ';background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center' : '') + '" data-label="' + esc(d.country) + '"></div>' +
         '<div class="apex-driver__num">' + esc(num) + '</div>' +
         '<div class="apex-driver__info">' +
           '<div class="name">' + esc(first) + (first ? '<br>' : '') + esc(last) + '</div>' +

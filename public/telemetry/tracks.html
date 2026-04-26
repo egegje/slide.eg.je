@@ -45,10 +45,6 @@
     </div>
   </div>
 
-  <p class="tele-intro">
-    Евгений Викторович, в базе сейчас 5 трасс — все во Флориде. Когда добавите европейские и японские через админку drift.eg.je, они тоже появятся. У каждой — уровень, серии, ссылки на карты и сайт.
-  </p>
-
   <div class="tele-tracks" id="tracks-grid"></div>
 </section>
 
@@ -87,7 +83,10 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
     if (t.mapsUrl) links.push('<a href="' + esc(t.mapsUrl) + '" target="_blank" rel="noopener">MAPS →</a>');
     if (t.website) links.push('<a href="' + esc(t.website) + '" target="_blank" rel="noopener">SITE →</a>');
     return '' +
-      '<div class="tele-track">' +
+      '<div class="tele-track" data-slot="track-' + esc(t.slug) + '">' +
+        (t.photo
+          ? '<div class="tele-track__photo has-photo" style="background-image:url(\'' + esc(t.photo) + '\')"></div>'
+          : '<div class="tele-track__photo ph" data-label="TRACK"></div>') +
         '<div class="tele-track__head">' +
           '<div class="tele-track__name">' + esc(t.name) + '</div>' +
           (lvl ? '<span class="tele-track__lvl">' + esc(lvl) + '</span>' : '') +

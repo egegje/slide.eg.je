@@ -142,6 +142,22 @@
   position: relative;
   z-index: 2;
 }
+.pad-hero__cell--poster.has-photo {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  padding: 18px;
+  border: 1px solid var(--line);
+  min-height: 180px;
+}
+.pad-hero__cell--poster.has-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%);
+  pointer-events: none;
+}
+.pad-hero__cell--poster.has-photo > * { position: relative; z-index: 1; }
 .pad-hero__cell h4 {
   font-family: var(--font-head);
   font-size: 13px;
@@ -508,6 +524,16 @@
   background: var(--surface);
   border: 1px solid var(--line);
   transition: all .2s var(--ease);
+}
+.pad-track__photo {
+  height: 180px;
+  margin: -28px -28px 16px;
+  background-size: cover;
+  background-position: center;
+}
+.pad-track__photo:not(.has-photo) {
+  background-image: repeating-linear-gradient(115deg, oklch(0.22 0.015 250) 0 6px, oklch(0.19 0.015 250) 6px 12px);
+  position: relative;
 }
 .pad-track:hover { border-color: var(--accent); transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--accent); }
 .pad-track::before {

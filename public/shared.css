@@ -102,6 +102,12 @@ button { background: none; border: 0; color: inherit; font: inherit; cursor: poi
     linear-gradient(to bottom, transparent 60%, oklch(0.10 0.01 250 / 0.9));
   pointer-events: none;
 }
+/* When the .ph carries a real photo via inline background-image we drop the
+   diagonal-stripes pattern and the small "DRIVER 02" label sticker. The
+   bottom-of-card gradient (::after) is kept so text overlays remain
+   readable. */
+.ph.has-photo { background-image: var(--bg-img, none); background-size: cover; background-position: center; }
+.ph.has-photo::before { display: none; }
 
 .chip {
   display: inline-flex;

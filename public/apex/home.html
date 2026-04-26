@@ -54,13 +54,10 @@
   </h1>
 
   <div class="apex-hero__foot">
-    <p class="apex-hero__lede">
-      Евгений Викторович, это главная страница варианта Apex — крупная типографика, воздух, один яркий акцент. Сверху можно разместить афишу ближайшего ивента, ниже — актуальный состав команды, затем календарь сезона и услуги.
-    </p>
-    <div class="apex-hero__event">
+    <div class="apex-hero__event" id="apex-hero-event" data-slot="hero">
       <div class="tag">Next event</div>
-      <div class="name">Poster goes here</div>
-      <div class="when">Когда добавите ивент через админку drift.eg.je, он появится здесь</div>
+      <div class="name">—</div>
+      <div class="when">—</div>
     </div>
     <div class="apex-hero__cta">
       <a class="btn btn--primary" href="calendar.html">Calendar →</a>
@@ -117,10 +114,6 @@
     </div>
   </div>
 
-  <div class="apex-note">
-    <b>Евгений Викторович,</b> здесь будут события сезона. Пока календарь не заполнен — вы сможете добавлять даты и трассы через админку drift.eg.je, и они появятся в этом списке автоматически.
-  </div>
-
   <div style="display:flex;gap:12px;flex-wrap:wrap">
     <a class="btn btn--primary" href="calendar.html">Open calendar →</a>
     <a class="btn" href="tracks.html">View tracks</a>
@@ -130,8 +123,8 @@
 <!-- CTA -->
 <section class="apex-cta">
   <h3>Join the team</h3>
-  <p>Евгений Викторович, сюда можно вынести тёплое приглашение для новых пилотов — что получает участник, как попасть в команду, куда писать. Сейчас кнопка ведёт в никуда — подставлю ссылку как скажете.</p>
-  <a class="btn" href="#">Message on Telegram →</a>
+  <p>Хочешь в команду? Напиши — расскажем что нужно для участия, тренировки и сборы.</p>
+  <a class="btn" href="https://t.me/x7777708" target="_blank" rel="noopener">Message on Telegram →</a>
 </section>
 
 <!-- FOOTER -->
@@ -192,8 +185,8 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
     var last = parts.pop() || d.name;
     var first = parts.join(' ');
     return '' +
-      '<div class="apex-driver">' +
-        '<div class="ph" style="position:absolute;inset:0" data-label="DRIVER ' + esc(num) + '"></div>' +
+      '<div class="apex-driver" data-slot="driver-' + esc(d.rank) + '">' +
+        '<div class="ph' + (d.photo ? ' has-photo' : '') + '" style="position:absolute;inset:0' + (d.photo ? ';background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center' : '') + '" data-label="DRIVER ' + esc(num) + '"></div>' +
         '<div class="apex-driver__num">' + esc(num) + '</div>' +
         '<div class="apex-driver__info">' +
           '<div class="name">' + esc(first) + (first ? '<br>' : '') + esc(last) + '</div>' +
@@ -201,6 +194,20 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
         '</div>' +
       '</div>';
   }).join('');
+
+  var ep = data.eventPoster || {};
+  var hero = document.getElementById('apex-hero-event');
+  if (hero) {
+    var hasContent = ep.photo || ep.title || ep.date || ep.track;
+    if (ep.photo) {
+      hero.classList.add('has-photo');
+      hero.style.backgroundImage = "url('" + ep.photo + "')";
+    }
+    hero.innerHTML =
+      '<div class="tag">Next event</div>' +
+      '<div class="name">' + esc(ep.title || (hasContent ? '' : 'Афиша скоро')) + '</div>' +
+      '<div class="when">' + esc([ep.date, ep.track].filter(Boolean).join(' · ')) + '</div>';
+  }
 })();
 </script>
 </body>

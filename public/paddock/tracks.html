@@ -42,10 +42,6 @@
     <span class="meta">5 IN DATABASE<br>FLORIDA</span>
   </div>
 
-  <p class="pad-intro">
-    Евгений Викторович, в базе сейчас 5 трасс — все во Флориде. Когда добавите европейские и японские через админку drift.eg.je, они тоже появятся здесь. У каждой карточки — уровень, серии чемпионатов и ссылки на карты и сайт.
-  </p>
-
   <div class="pad-tracks" id="tracks-grid"></div>
 </section>
 
@@ -84,7 +80,10 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
     if (t.website) footParts.push('<a href="' + esc(t.website) + '" target="_blank" rel="noopener">SITE →</a>');
     if (!footParts.length) footParts.push('<span>—</span>');
     return '' +
-      '<div class="pad-track">' +
+      '<div class="pad-track" data-slot="track-' + esc(t.slug) + '">' +
+        (t.photo
+          ? '<div class="pad-track__photo has-photo" style="background-image:url(\'' + esc(t.photo) + '\')"></div>'
+          : '<div class="pad-track__photo ph" data-label="TRACK"></div>') +
         '<div class="pad-track__head">' +
           '<div class="pad-track__name">' + esc(t.name) + '</div>' +
           (lvl ? '<span class="pad-track__lvl">' + esc(lvl) + '</span>' : '') +

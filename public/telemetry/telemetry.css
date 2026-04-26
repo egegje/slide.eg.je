@@ -481,6 +481,16 @@
   gap: 10px;
   transition: all .2s var(--ease);
 }
+.tele-track__photo {
+  height: 160px;
+  margin: -18px -18px 8px;
+  background-size: cover;
+  background-position: center;
+}
+.tele-track__photo:not(.has-photo) {
+  background-image: repeating-linear-gradient(115deg, oklch(0.22 0.015 250) 0 6px, oklch(0.19 0.015 250) 6px 12px);
+  position: relative;
+}
 .tele-track:hover { border-color: var(--accent); }
 .tele-track__head {
   display: flex;

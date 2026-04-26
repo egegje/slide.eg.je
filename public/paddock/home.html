@@ -57,10 +57,10 @@
   </h1>
 
   <div class="pad-hero__bottom">
-    <div class="pad-hero__cell">
+    <div class="pad-hero__cell pad-hero__cell--poster" id="pad-hero-event" data-slot="hero">
       <h4>POSTER</h4>
-      <b>Event goes here</b>
-      <p>Евгений Викторович, сверху можно разместить афишу ближайшего этапа — дата, трасса, кнопка регистрации.</p>
+      <b>—</b>
+      <p>—</p>
     </div>
     <div class="pad-hero__cell">
       <h4>TEAM</h4>
@@ -97,10 +97,6 @@
     <span class="meta">24 DRIVERS<br>SEASON 2026</span>
   </div>
 
-  <p class="pad-intro">
-    Евгений Викторович, это первая тройка гонщиков из базы drift.eg.je — в таком формате карточки будут на главной. Все 24 пилота — на странице Пилоты.
-  </p>
-
   <div class="pad-crew" id="crew-top"></div>
 
   <div style="margin-top:24px">
@@ -116,10 +112,6 @@
     <span class="meta">AWAITING<br>DATA</span>
   </div>
 
-  <div class="pad-note">
-    <b>Евгений Викторович,</b> здесь будут события сезона. Пока календарь не заполнен — вы сможете добавлять даты, названия и трассы через админку drift.eg.je. Они появятся в этом блоке автоматически.
-  </div>
-
   <div style="display:flex;gap:12px;flex-wrap:wrap">
     <a class="btn btn--primary" href="calendar.html">Open calendar →</a>
     <a class="btn" href="tracks.html">View tracks</a>
@@ -131,7 +123,7 @@
   <div class="pad-shop__inner">
     <h3><span>Services.</span><br><span style="color:var(--accent)">4 items.</span></h3>
     <div>
-      <p>Евгений Викторович, на странице Услуги — уроки дрифта, фото/видео съёмка, техподдержка и разработка ливреи. Все контакты ведут на ваш Telegram. Тексты и цены можно править через админку drift.eg.je.</p>
+      <p>Уроки дрифта, фото/видео съёмка, техподдержка и разработка ливреи. Все контакты — через Telegram.</p>
       <div style="display:flex; gap:10px; flex-wrap:wrap">
         <a class="btn btn--primary" href="shop.html">Open shop →</a>
         <a class="btn" href="drivers.html">Drivers</a>
@@ -182,9 +174,9 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
     var num = String(d.rank).padStart(2, '0');
     var tape = i === 0 ? 'PRO · #1' : (i === 1 ? 'PRO' : 'PRO');
     return '' +
-      '<div class="pad-crew__card">' +
+      '<div class="pad-crew__card" data-slot="driver-' + esc(d.rank) + '">' +
         '<div class="pad-crew__img">' +
-          '<div class="ph" data-label="' + esc(d.country) + '"></div>' +
+          '<div class="ph' + (d.photo ? ' has-photo' : '') + '"' + (d.photo ? ' style="background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center"' : '') + ' data-label="' + esc(d.country) + '"></div>' +
           '<span class="pad-crew__tape">' + esc(tape) + '</span>' +
           '<span class="pad-crew__num">' + esc(num) + '</span>' +
         '</div>' +
@@ -199,6 +191,21 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
         '</div>' +
       '</div>';
   }).join('');
+
+  var ep = data.eventPoster || {};
+  var hero = document.getElementById('pad-hero-event');
+  if (hero) {
+    var hasContent = ep.photo || ep.title || ep.date || ep.track;
+    if (ep.photo) {
+      hero.classList.add('has-photo');
+      hero.style.backgroundImage = "url('" + ep.photo + "')";
+    }
+    var line2 = [ep.date, ep.track].filter(Boolean).join(' · ');
+    hero.innerHTML =
+      '<h4>POSTER</h4>' +
+      '<b>' + esc(ep.title || (hasContent ? '' : 'Афиша скоро')) + '</b>' +
+      '<p>' + esc(line2) + '</p>';
+  }
 })();
 </script>
 </body>

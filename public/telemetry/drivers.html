@@ -45,10 +45,6 @@
     </div>
   </div>
 
-  <p class="tele-intro">
-    Евгений Викторович, это все 24 гонщика которых я взял с drift.eg.je — мировой топ (Formula Drift, D1GP, Drift Masters Europe) и ключевые российские пилоты. Каждая карточка в стиле приборной панели: HP, двигатель, страна, титулы.
-  </p>
-
   <div class="tele-drivers" id="drivers-grid"></div>
 </section>
 
@@ -81,9 +77,9 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
     var num = String(d.rank).padStart(2, '0');
     var titles = (d.titles || []).slice(0, 2).map(esc).join(' · ');
     return '' +
-      '<div class="tele-driver tele-driver--full">' +
+      '<div class="tele-driver tele-driver--full" data-slot="driver-' + esc(d.rank) + '">' +
         '<div class="tele-driver__img">' +
-          '<div class="ph" data-label="' + esc(num) + '"></div>' +
+          '<div class="ph' + (d.photo ? ' has-photo' : '') + '"' + (d.photo ? ' style="background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center"' : '') + ' data-label="' + esc(num) + '"></div>' +
           '<div class="num">' + esc(num) + '</div>' +
           '<div class="tele-driver__flag">' + esc(d.flag || '') + '</div>' +
         '</div>' +

@@ -1,2 +1,13 @@
 node_modules
 .DS_Store
+
+# Admin secrets
+data/session-secret
+data/users.json
+data/uploads.log
+data/gallery.json
+
+# Uploaded media (regenerated per environment)
+public/photos/
+public/gallery/
+public/videos/
