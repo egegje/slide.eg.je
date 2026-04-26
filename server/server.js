@@ -242,9 +242,11 @@ const DASH_HTML = `<!doctype html>
   .editor .save-tag { font-size: 10px; color: var(--ok); display: none; margin-left: auto; align-self: center; }
   .editor .save-tag.show { display: inline; }
 
-  .gallery-drop { border: 2px dashed var(--line); border-radius: 12px; padding: 28px 20px; text-align: center; color: var(--muted); margin-bottom: 14px; transition: border-color .15s, background .15s; }
-  .gallery-drop.over { border-color: var(--accent); background: rgba(255,59,48,0.05); color: var(--fg); }
-  .gallery-drop label { color: var(--accent); cursor: pointer; }
+  .gallery-drop { display: block; border: 2px dashed var(--line); border-radius: 12px; padding: 22px 18px; text-align: center; color: var(--muted); margin-bottom: 14px; transition: border-color .15s, background .15s, color .15s; cursor: pointer; }
+  .gallery-drop:hover { border-color: var(--accent); color: var(--fg); background: rgba(255,59,48,0.04); }
+  .gallery-drop.over { border-color: var(--accent); background: rgba(255,59,48,0.1); color: var(--fg); }
+  .gallery-drop b { color: var(--fg); display: block; margin-bottom: 4px; font-size: 13px; }
+  .gallery-drop em { font-style: normal; color: var(--accent); }
   .gallery-drop input { display: none; }
   .gal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .gal-item { position: relative; aspect-ratio: 1/1; background: #15151a; border-radius: 8px; overflow: hidden; }
@@ -680,11 +682,15 @@ const DASH_HTML = `<!doctype html>
   }
 
   function renderGallerySection() {
-    const drop = '<div class="gallery-drop" id="drop-zone" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">' +
-      'Перетащи файлы или <label for="gal-input">выбери</label>' +
-      '<input id="gal-input" type="file" multiple accept="image/*,video/*" onchange="uploadGallery(this.files)">' +
-      '<div style="font-size:10px;margin-top:6px;color:var(--muted)">Фото до 25 МБ · Видео до 200 МБ</div>' +
-      '</div>';
+    // Whole zone is a <label> so any click bubbles to the file input. The
+    // older "click the small word 'выбери'" UX failed on desktop — users
+    // didn't realize the link was a button.
+    const drop = '<label class="gallery-drop" id="drop-zone" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">' +
+      '<b>+ Добавить фото и видео</b>' +
+      '<span>Перетащи файлы сюда или <em>нажми</em>, чтобы выбрать</span>' +
+      '<input type="file" multiple accept="image/*,video/*" onchange="uploadGallery(this.files)">' +
+      '<div style="font-size:10px;margin-top:6px;color:var(--muted)">Фото до 25 МБ · Видео до 200 МБ · можно сразу несколько</div>' +
+      '</label>';
     const grid = state.gallery.length
       ? '<div class="gal-grid">' + state.gallery.map((g) =>
           '<div class="gal-item">' +
