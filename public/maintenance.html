@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Технические работы — Dark Force</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root {
+    --bg: oklch(0.10 0.012 250);
+    --fg: oklch(0.97 0.006 80);
+    --fg-dim: oklch(0.62 0.014 250);
+    --line: oklch(0.32 0.015 250);
+    --accent: oklch(0.74 0.20 55);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--fg);
+    font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    height: 100%;
+  }
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-image:
+      radial-gradient(circle at 20% 30%, oklch(0.18 0.04 55 / 0.45), transparent 55%),
+      radial-gradient(circle at 80% 75%, oklch(0.20 0.05 30 / 0.35), transparent 60%);
+  }
+  .wrap {
+    max-width: 540px;
+    width: 100%;
+    text-align: center;
+  }
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 36px;
+    font-family: 'Bebas Neue', 'Oswald', 'Impact', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.06em;
+  }
+  .mark svg { width: 32px; height: 32px; }
+  .mark b { color: var(--accent); }
+  .stripes {
+    height: 12px;
+    background-image: repeating-linear-gradient(
+      135deg,
+      var(--accent) 0 14px,
+      transparent 14px 28px
+    );
+    margin-bottom: 28px;
+  }
+  h1 {
+    font-family: 'Bebas Neue', 'Oswald', 'Impact', sans-serif;
+    font-size: clamp(40px, 8vw, 68px);
+    letter-spacing: 0.02em;
+    line-height: 0.98;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  h1 b { color: var(--accent); font-weight: inherit; }
+  p {
+    color: var(--fg-dim);
+    font-size: 16px;
+    line-height: 1.55;
+    max-width: 440px;
+    margin: 0 auto 28px;
+  }
+  .meta {
+    font-family: 'JetBrains Mono', 'Menlo', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    margin-top: 28px;
+  }
+  .pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 6px;
+    vertical-align: middle;
+    animation: pulse 1.4s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.85); }
+  }
+</style>
+</head><body>
+<div class="wrap">
+  <div class="mark">
+    <svg viewBox="0 0 28 28" fill="none">
+      <path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="oklch(0.74 0.20 55)"/>
+    </svg>
+    DRIFT<b>.EG.JE</b>
+  </div>
+  <div class="stripes" aria-hidden="true"></div>
+  <h1>Технические <b>работы</b></h1>
+  <p>Сайт временно недоступен — добавляем новые разделы и улучшаем админку. Скоро вернёмся.</p>
+  <div class="meta"><span class="pulse"></span>Dark Force · сезон 2026</div>
+</div>
+</body></html>

@@ -125,11 +125,19 @@ await app.register(multipart, { limits: { fileSize: VIDEO_MAX } });
 
 const requireAuth = async (req, reply) => {
   const user = req.session.get("user");
+  const wantsJson = (req.headers.accept || "").includes("application/json")
+    || req.url.startsWith("/admin/api/");
   if (!user) {
-    const wantsJson = (req.headers.accept || "").includes("application/json")
-      || req.url.startsWith("/admin/api/");
     if (wantsJson) return reply.code(401).send({ error: "auth required" });
     return reply.redirect("/admin/login");
+  }
+  // Maintenance: only owner login "eg" can use admin while it's on.
+  // Older sessions for other users get bounced back to the login page so
+  // they re-auth and see the maintenance error there.
+  if (await isMaintenanceMode() && String(user).toLowerCase() !== MAINTENANCE_OWNER_LOGIN) {
+    req.session.delete();
+    if (wantsJson) return reply.code(503).send({ error: "maintenance" });
+    return reply.redirect("/admin/login?err=maintenance");
   }
   req.adminUser = user;
 };
@@ -159,6 +167,12 @@ $BODY$
 </body></html>`;
 
 app.get("/admin/login", async (req, reply) => {
+  let err = "";
+  if (req.query.err === "maintenance") {
+    err = "Технические работы. Доступ временно ограничен.";
+  } else if (req.query.err) {
+    err = "Неверный логин или пароль";
+  }
   reply.type("text/html").send(PAGE_LOGIN.replace("$BODY$", `
     <form method="post" action="/admin/login">
       <h1>Dark Force / admin</h1>
@@ -167,9 +181,17 @@ app.get("/admin/login", async (req, reply) => {
       <label>Пароль</label>
       <input name="password" type="password" required>
       <button type="submit">Войти</button>
-      <div class="err">${req.query.err ? "Неверный логин или пароль" : ""}</div>
+      <div class="err">${err}</div>
     </form>`));
 });
+
+// While maintenance mode is on, only the owner login "eg" is permitted to
+// reach the admin dashboard. Other users see the maintenance message.
+const MAINTENANCE_OWNER_LOGIN = "eg";
+async function isMaintenanceMode() {
+  const settings = await readJson(join(DATA_DIR, "settings.json"), { maintenance: true });
+  return Boolean(settings.maintenance);
+}
 
 app.post("/admin/login", async (req, reply) => {
   const body = req.body ?? {};
@@ -180,6 +202,9 @@ app.post("/admin/login", async (req, reply) => {
   let ok = false;
   if (u) { try { ok = await argon2.verify(u.passwordHash, password); } catch {} }
   if (!ok) return reply.redirect("/admin/login?err=1");
+  if (await isMaintenanceMode() && u.login.toLowerCase() !== MAINTENANCE_OWNER_LOGIN) {
+    return reply.redirect("/admin/login?err=maintenance");
+  }
   req.session.set("user", u.login);
   return reply.redirect("/admin");
 });
@@ -1671,6 +1696,40 @@ app.post("/admin/api/discard-draft", { preHandler: requireAuth }, async (req, re
   const pub = await readJson(DRIFT_DATA_PUB, {});
   await writeJson(DRIFT_DATA_DRAFT, pub);
   return { ok: true };
+});
+
+// Sets the bypass cookie that lets visitors skip the maintenance page on the
+// public site. The token is shared between Caddyfile (cookie matcher) and
+// this route — keep them in sync. Cookie is httpOnly+SameSite=lax+30d.
+const PREVIEW_TOKEN = "eg2026";
+app.get("/preview-unlock", async (req, reply) => previewUnlockHandler(req, reply));
+app.get("/preview-unlock/:token", async (req, reply) => previewUnlockHandler(req, reply));
+async function previewUnlockHandler(req, reply) {
+  const token = req.params?.token || req.query?.token;
+  if (token !== PREVIEW_TOKEN) {
+    return reply.code(404).type("text/plain").send("not found");
+  }
+  reply.header(
+    "set-cookie",
+    `df_preview=${PREVIEW_TOKEN}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax`,
+  );
+  return reply.redirect("/");
+}
+
+// Toggle maintenance via admin. Only owner ("eg") can flip it.
+app.get("/admin/api/maintenance", { preHandler: requireAuth }, async (req) => {
+  const settings = await readJson(join(DATA_DIR, "settings.json"), { maintenance: true });
+  return { ...settings, currentUser: req.adminUser };
+});
+app.post("/admin/api/maintenance", { preHandler: requireAuth }, async (req, reply) => {
+  if (String(req.adminUser).toLowerCase() !== MAINTENANCE_OWNER_LOGIN) {
+    return reply.code(403).send({ error: "owner only" });
+  }
+  const { on } = req.body ?? {};
+  const settings = await readJson(join(DATA_DIR, "settings.json"), { maintenance: true });
+  settings.maintenance = Boolean(on);
+  await writeJson(join(DATA_DIR, "settings.json"), settings);
+  return { ok: true, maintenance: settings.maintenance };
 });
 
 app.get("/admin/health", async () => ({ ok: true }));
