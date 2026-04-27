@@ -15,7 +15,40 @@
     border-bottom: 1px solid var(--line);
     position: relative;
     overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.2fr auto;
+    gap: 40px;
+    align-items: center;
   }
+  @media (max-width: 800px) { .pad-team-hero { grid-template-columns: 1fr; } }
+  .pad-team-hero__mask {
+    position: relative;
+    width: clamp(220px, 32vw, 360px);
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+  }
+  .pad-team-hero__mask img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    transform: rotate(-3deg);
+    filter: drop-shadow(0 0 30px oklch(0.74 0.20 55 / 0.35));
+  }
+  .pad-team-hero__mask::after {
+    content: "DRIFT TEAM · EST 2022 ·";
+    position: absolute;
+    inset: 0;
+    border: 2px dashed var(--accent);
+    border-radius: 50%;
+    animation: mask-spin 24s linear infinite;
+    transform-origin: 50% 50%;
+    color: transparent;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    pointer-events: none;
+  }
+  @keyframes mask-spin { to { transform: rotate(360deg); } }
+  .pad-team-hero__text { min-width: 0; }
   .pad-team-hero h1 {
     font-family: var(--font-head);
     font-size: clamp(56px, 11vw, 140px);
@@ -261,9 +294,14 @@
 </header>
 
 <section class="pad-team-hero">
-  <div class="pad-team-hero__tag">DRIFT TEAM · SEASON 2026</div>
-  <h1 id="team-name">Dark <b>Force</b></h1>
-  <div class="pad-team-hero__slogans" id="team-slogans"></div>
+  <div class="pad-team-hero__text">
+    <div class="pad-team-hero__tag">DRIFT TEAM · SEASON 2026</div>
+    <h1 id="team-name">Dark <b>Force</b></h1>
+    <div class="pad-team-hero__slogans" id="team-slogans"></div>
+  </div>
+  <div class="pad-team-hero__mask" aria-hidden="true">
+    <img src="../brand/logo-mask.png" alt="Dark Force mask">
+  </div>
 </section>
 
 <div class="pad-team-meta" id="team-meta"></div>

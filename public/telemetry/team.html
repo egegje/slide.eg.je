@@ -14,11 +14,31 @@
     padding: 50px 24px 36px;
     border-bottom: 1px solid var(--line);
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 24px;
-    align-items: end;
+    grid-template-columns: auto 1fr auto;
+    gap: 28px;
+    align-items: center;
   }
-  @media (max-width: 720px) { .tele-team-hero { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .tele-team-hero { grid-template-columns: 1fr; } }
+  .tele-team-hero__mask {
+    width: clamp(180px, 22vw, 280px);
+    aspect-ratio: 1 / 1;
+    position: relative;
+  }
+  .tele-team-hero__mask img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 24px oklch(0.74 0.20 55 / 0.4));
+  }
+  .tele-team-hero__mask::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--accent);
+    background:
+      linear-gradient(transparent 49.5%, oklch(0.74 0.20 55 / 0.35) 50%, transparent 50.5%),
+      linear-gradient(90deg, transparent 49.5%, oklch(0.74 0.20 55 / 0.35) 50%, transparent 50.5%);
+    pointer-events: none;
+  }
   .tele-team-hero__kicker {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -269,6 +289,9 @@
 </header>
 
 <section class="tele-team-hero">
+  <div class="tele-team-hero__mask" aria-hidden="true">
+    <img src="../brand/logo-mask.png" alt="Dark Force mask">
+  </div>
   <div>
     <div class="tele-team-hero__kicker">Drift Team · Season 2026</div>
     <h1 id="team-name">Dark <b>Force</b></h1>
