@@ -793,18 +793,32 @@ function resolveSlot(slotId, data) {
 }
 
 app.post("/admin/api/upload-slot", { preHandler: requireAuth }, async (req, reply) => {
+  // CRITICAL: each part's stream MUST be consumed inside the loop before
+  // moving to the next iteration. Holding a file-part reference for later
+  // consumption stalls the multipart parser on anything bigger than a few
+  // hundred KB, manifesting as ECONNRESET aborts mid-upload.
   const parts = req.parts();
-  let file = null;
+  let fileBuf = null;
+  let fileName = null;
   let slotId = null;
   for await (const part of parts) {
-    if (part.type === "file") file = part;
-    else if (part.fieldname === "slot") slotId = part.value;
+    if (part.type === "file") {
+      const ext = extname(part.filename || "").toLowerCase();
+      if (!ALLOWED_PHOTO.has(ext)) {
+        // Drain the stream so the connection closes cleanly.
+        await part.toBuffer().catch(() => {});
+        return reply.code(400).send({ error: "photo type not allowed" });
+      }
+      fileBuf = await part.toBuffer();
+      fileName = part.filename;
+      if (fileBuf.length > PHOTO_MAX) {
+        return reply.code(400).send({ error: "too large", maxBytes: PHOTO_MAX });
+      }
+    } else if (part.fieldname === "slot") {
+      slotId = part.value;
+    }
   }
-  if (!file || !slotId) return reply.code(400).send({ error: "missing fields" });
-  const ext = extname(file.filename).toLowerCase();
-  if (!ALLOWED_PHOTO.has(ext)) return reply.code(400).send({ error: "photo type not allowed" });
-  const buf = await file.toBuffer();
-  if (buf.length > PHOTO_MAX) return reply.code(400).send({ error: "too large" });
+  if (!fileBuf || !slotId) return reply.code(400).send({ error: "missing fields" });
 
   const data = await readJson(DRIFT_DATA, {});
   const slot = resolveSlot(slotId, data);
@@ -813,11 +827,10 @@ app.post("/admin/api/upload-slot", { preHandler: requireAuth }, async (req, repl
   const dir = join(PHOTO_DIR, slot.dirName);
   await mkdir(dir, { recursive: true });
   const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-  const original = `${slotId}--${stamp}-${file.filename}`;
+  const original = `${slotId}--${stamp}-${fileName}`;
   const fname = uniqueName(dir, original);
-  await writeFile(join(dir, fname), buf);
+  await writeFile(join(dir, fname), fileBuf);
 
-  // Remove the previous file if it points into our managed photos dir
   if (slot.target.photo && slot.target.photo.startsWith(slot.photoPrefix)) {
     await unlink(join(PUB, slot.target.photo)).catch(() => {});
   }
@@ -825,7 +838,7 @@ app.post("/admin/api/upload-slot", { preHandler: requireAuth }, async (req, repl
 
   await writeJson(DRIFT_DATA, data);
   await syncDriftDataJs(data);
-  await logUpload(req.adminUser, slot.kind + "-photo", slotId, fname, buf.length);
+  await logUpload(req.adminUser, slot.kind + "-photo", slotId, fname, fileBuf.length);
   return { ok: true, url: slot.target.photo };
 });
 
