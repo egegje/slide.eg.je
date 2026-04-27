@@ -7,6 +7,7 @@ data/users.json
 data/uploads.log
 data/gallery.json
 data/drift-data.draft.json
+data/settings.json
 
 # Uploaded media (regenerated per environment)
 public/photos/
