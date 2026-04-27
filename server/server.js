@@ -11,8 +11,14 @@ import { randomBytes } from "node:crypto";
 const ROOT = "/opt/slide.eg.je";
 const DATA_DIR = join(ROOT, "data");
 const PUB = join(ROOT, "public");
-const DRIFT_DATA = join(PUB, "drift-data.json");
+// PUBLISHED data — what the live site reads via drift-data.js.
+const DRIFT_DATA_PUB = join(PUB, "drift-data.json");
 const DRIFT_DATA_JS = join(PUB, "drift-data.js");
+// DRAFT data — what admin reads/writes. Promoted to published on Publish.
+const DRIFT_DATA_DRAFT = join(DATA_DIR, "drift-data.draft.json");
+// Reads/writes from admin always go through DRIFT_DATA_DRAFT; the live
+// drift-data.json is treated as immutable until publishDraft() runs.
+const DRIFT_DATA = DRIFT_DATA_DRAFT;
 const USERS_FILE = join(DATA_DIR, "users.json");
 const GALLERY_FILE = join(DATA_DIR, "gallery.json");
 const SESSION_KEY_FILE = join(DATA_DIR, "session-secret");
@@ -32,10 +38,11 @@ const ALLOWED_VIDEO = new Set([".mp4", ".mov", ".webm", ".m4v"]);
 // widget. The exact px/MB numbers are advisory — the server still enforces
 // PHOTO_MAX bytes and the ALLOWED_PHOTO extension set.
 const PHOTO_SPECS = {
-  hero:    { label: "Афиша · 16:9", min: "1600×900", max: "5 МБ", note: "JPG / PNG / WEBP. Лучше 1920×1080 или больше." },
-  driver:  { label: "Пилот · 4:5",  min: "800×1000", max: "5 МБ", note: "Портрет, лицо в центре. JPG / PNG / WEBP." },
-  track:   { label: "Трасса · 16:9", min: "1200×675", max: "5 МБ", note: "Аэро или панорама трассы. JPG / PNG / WEBP." },
-  gallery: { label: "Галерея",       min: "—",         max: "25 МБ фото / 200 МБ видео", note: "Любые фото и видео." },
+  hero:    { label: "Афиша · 16:9", min: "1600×900", max: "5 МБ", note: "JPG / PNG / WEBP. Лучше 1920×1080 или больше.", aspect: "16/9" },
+  driver:  { label: "Пилот · 4:5",  min: "800×1000", max: "5 МБ", note: "Портрет, лицо в центре. JPG / PNG / WEBP.",   aspect: "4/5" },
+  track:   { label: "Трасса · 16:9", min: "1200×675", max: "5 МБ", note: "Аэро или панорама трассы. JPG / PNG / WEBP.",   aspect: "16/9" },
+  car:     { label: "Машина · 4:3",  min: "1200×900", max: "5 МБ", note: "Машина в кадре, контрастный фон. JPG / PNG / WEBP.", aspect: "4/3" },
+  gallery: { label: "Галерея",       min: "—",         max: "25 МБ фото / 200 МБ видео", note: "Любые фото и видео.", aspect: "1/1" },
 };
 
 async function readJson(path, fallback) {
@@ -46,14 +53,38 @@ async function writeJson(path, data) {
   await writeFile(path, JSON.stringify(data, null, 2), "utf8");
 }
 
-// The public site (all three design variants) reads from drift-data.js which
-// sets window.DRIFT_DATA. Whenever drift-data.json changes we mirror it into
-// the .js so the front-end picks up the change on the next page load.
-async function syncDriftDataJs(data) {
-  const banner = "// Auto-generated from admin photo uploads.\n" +
-    "// Edits here are overwritten on next change — change drift-data.json instead.\n";
-  const body = "window.DRIFT_DATA = \n" + JSON.stringify(data) + "\n;\n";
+// The public site (all three design variants) reads window.DRIFT_DATA from
+// drift-data.js. The smart loader checks for ?draft=1 and fetches draft
+// data via XHR for the admin preview iframe. Otherwise it returns the
+// published data baked into the script body.
+async function syncDriftDataJs(publishedData) {
+  const banner = "// Auto-generated. Edits here are overwritten on next publish.\n" +
+    "// To preview drafts, append ?draft=1 to the URL — admin pulls from /admin/api/drift-data-draft.json.\n";
+  const literal = JSON.stringify(publishedData);
+  const body =
+    "window.DRIFT_DATA = (function () {\n" +
+    "  if (typeof location !== 'undefined' && location.search.indexOf('draft=1') !== -1) {\n" +
+    "    try {\n" +
+    "      var xhr = new XMLHttpRequest();\n" +
+    "      xhr.open('GET', '/admin/api/drift-data-draft.json', false);\n" +
+    "      xhr.withCredentials = true;\n" +
+    "      xhr.send(null);\n" +
+    "      if (xhr.status === 200) return JSON.parse(xhr.responseText);\n" +
+    "    } catch (e) { /* fall through to published */ }\n" +
+    "  }\n" +
+    "  return " + literal + ";\n" +
+    "})();\n";
   await writeFile(DRIFT_DATA_JS, banner + body, "utf8");
+}
+
+// Bootstrap: if drift-data.draft.json doesn't exist, seed it from the
+// published drift-data.json so the admin has something to edit on first run.
+async function ensureDraftExists() {
+  if (!existsSync(DRIFT_DATA_DRAFT)) {
+    let pub = {};
+    try { pub = JSON.parse(await readFile(DRIFT_DATA_PUB, "utf8")); } catch {}
+    await writeFile(DRIFT_DATA_DRAFT, JSON.stringify(pub, null, 2), "utf8");
+  }
 }
 
 async function loadUsers() { return readJson(USERS_FILE, []); }
@@ -256,7 +287,46 @@ const DASH_HTML = `<!doctype html>
   .gal-item button.del:hover { background: var(--accent); border-color: var(--accent); }
   .gal-item .meta { position: absolute; bottom: 0; left: 0; right: 0; padding: 4px 8px; font-size: 10px; color: white; background: linear-gradient(transparent, rgba(0,0,0,0.7)); pointer-events: none; }
 
-  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 8px; font-size: 12px; z-index: 100; box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 8px; font-size: 12px; z-index: 200; box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
+
+  /* Publish bar at the top of the rail. Stays sticky. */
+  .pub { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; margin: -14px 0 12px; border-bottom: 1px solid var(--line); }
+  .pub__row { display: flex; gap: 8px; align-items: center; }
+  .pub__count { font-size: 12px; color: var(--muted); flex: 1; }
+  .pub__count b { color: var(--accent); font-weight: 700; }
+  .pub__btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: white; cursor: pointer; font-weight: 600; font-size: 12px; }
+  .pub__btn:disabled { opacity: 0.4; cursor: default; background: var(--line); border-color: var(--line); color: var(--muted); }
+  .pub__btn--ghost { background: transparent; color: var(--accent); }
+  .pub__btn--ghost:hover { background: rgba(255,59,48,0.1); }
+
+  /* Edit-entity inline form */
+  .slot__edit { padding: 4px 9px; border-radius: 6px; border: 1px solid var(--line); background: #1a1a20; color: var(--fg); cursor: pointer; font-size: 11px; margin-bottom: 4px; }
+  .slot__edit:hover { border-color: var(--accent); color: var(--accent); }
+  .slot__crop { padding: 4px 9px; border-radius: 6px; border: 1px solid var(--line); background: #1a1a20; color: var(--fg); cursor: pointer; font-size: 11px; }
+  .slot__crop:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Drag-reorder visual feedback */
+  .slot[draggable="true"] { cursor: grab; }
+  .slot.drag-source { opacity: 0.4; }
+  .slot.drag-target { border-color: var(--accent); border-style: dashed; }
+
+  /* Cropper modal */
+  .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 150; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal { background: #131318; border: 1px solid var(--line); border-radius: 14px; padding: 18px; max-width: 720px; width: 100%; max-height: 90vh; overflow: auto; }
+  .modal h3 { margin: 0 0 4px; font-size: 15px; }
+  .modal .req { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+  .crop-frame-wrap { display: flex; justify-content: center; margin-bottom: 14px; }
+  .crop-frame { position: relative; background: #000; border: 1px solid var(--line); overflow: hidden; user-select: none; max-width: 100%; }
+  .crop-img { position: absolute; inset: 0; background-size: cover; background-position: 50% 50%; cursor: grab; transform-origin: 50% 50%; }
+  .crop-img.dragging { cursor: grabbing; transition: none; }
+  .crop-row { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; font-size: 12px; }
+  .crop-row label { color: var(--muted); min-width: 50px; }
+  .crop-row input[type="range"] { flex: 1; }
+  .crop-row .v { font-family: ui-monospace, monospace; color: var(--fg); min-width: 40px; text-align: right; }
+  .modal__actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; flex-wrap: wrap; }
+  .modal__actions button { padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: #1a1a20; color: var(--fg); cursor: pointer; font-size: 12px; }
+  .modal__actions button.primary { background: var(--accent); color: white; border-color: var(--accent); font-weight: 600; }
+  .modal__actions button.ghost { color: var(--muted); }
 
   @media (max-width: 900px) {
     .layout { grid-template-columns: 1fr; grid-template-rows: 50% 50%; }
@@ -277,7 +347,7 @@ const DASH_HTML = `<!doctype html>
       <span class="grow"></span>
       <span class="url" id="frame-url">/apex/home.html</span>
     </div>
-    <div class="frame-wrap"><iframe class="frame" id="frame" src="/apex/home.html"></iframe></div>
+    <div class="frame-wrap"><iframe class="frame" id="frame" src="/apex/home.html?draft=1"></iframe></div>
   </main>
 </div>
 
@@ -288,9 +358,12 @@ const DASH_HTML = `<!doctype html>
     variant: 'apex',
     page: 'home',
     activeSlot: null,
-    newForm: null, // null | 'driver' | 'track' — controls which inline form is open
+    newForm: null,        // null | 'driver' | 'track' | 'car' — which inline form is open
+    editEntity: null,     // { kind, id }   — opens edit form for an existing entity
+    cropper: null,        // { slotId, photoUrl, x, y, zoom, kind } — opens cropper modal
     drivers: [],
     tracks: [],
+    cars: [],
     eventPoster: null,
     gallery: [],
   };
@@ -317,9 +390,16 @@ const DASH_HTML = `<!doctype html>
   }
 
   function pageForSlot(slotId) {
-    if (slotId === 'hero' || slotId.startsWith('driver-')) return 'home';
+    if (slotId === 'hero' || slotId.startsWith('driver-') || slotId.startsWith('car-')) return 'home';
     if (slotId.startsWith('track-')) return 'tracks';
     return 'home';
+  }
+  function kindForSlot(slotId) {
+    if (slotId === 'hero') return 'hero';
+    if (slotId.startsWith('driver-')) return 'driver';
+    if (slotId.startsWith('track-')) return 'track';
+    if (slotId.startsWith('car-')) return 'car';
+    return null;
   }
 
   function setVariant(v) {
@@ -329,8 +409,9 @@ const DASH_HTML = `<!doctype html>
   }
 
   function refreshFrame() {
-    const url = '/' + state.variant + '/' + state.page + '.html?v=' + Date.now() + (state.activeSlot ? '#slot-' + state.activeSlot : '');
-    document.getElementById('frame-url').textContent = url.replace(/\\?v=\\d+/, '');
+    // ?draft=1 tells shared.js to load draft data instead of published.
+    const url = '/' + state.variant + '/' + state.page + '.html?draft=1&v=' + Date.now() + (state.activeSlot ? '#slot-' + state.activeSlot : '');
+    document.getElementById('frame-url').textContent = url.replace(/\\?draft=1&v=\\d+/, '?draft=1');
     document.getElementById('frame').src = url;
   }
 
@@ -363,14 +444,16 @@ const DASH_HTML = `<!doctype html>
     if (!data) return;
     state.drivers = data.drivers || [];
     state.tracks = data.tracks || [];
+    state.cars = data.cars || [];
     state.eventPoster = data.eventPoster || {};
     state.gallery = data.gallery || [];
     renderRail();
+    await refreshPublishStatus();
   }
 
   function renderRail() {
     const rail = document.getElementById('rail');
-    const editor = state.activeSlot ? renderEditor() : '';
+    const editor = state.editEntity ? renderEditEntityForm() : (state.activeSlot ? renderEditor() : '');
     const heroSlot = renderSlot('hero', 'Афиша главной', heroSubtitle(), state.eventPoster && state.eventPoster.photo, state.eventPoster && state.eventPoster.photo);
     const driverSlots = state.drivers.map((d) =>
       renderSlot('driver-' + d.rank, '#' + d.rank + ' · ' + (d.name || ''), (d.car || '') + ' · ' + (d.hp || '') + ' HP', !!d.photo, d.photo, 'driver', d.rank)
@@ -378,10 +461,14 @@ const DASH_HTML = `<!doctype html>
     const trackSlots = state.tracks.map((t) =>
       renderSlot('track-' + t.slug, t.name, [t.city, t.region].filter(Boolean).join(', '), !!t.photo, t.photo, 'track', t.slug)
     ).join('');
+    const carSlots = state.cars.map((c) =>
+      renderSlot('car-' + c.id, c.name, [c.engine, c.hp ? c.hp + ' HP' : null].filter(Boolean).join(' · '), !!c.photo, c.photo, 'car', c.id)
+    ).join('');
     const gallerySection = renderGallerySection();
 
     const driverNew = state.newForm === 'driver' ? renderDriverForm() : '';
     const trackNew = state.newForm === 'track' ? renderTrackForm() : '';
+    const carNew = state.newForm === 'car' ? renderCarForm() : '';
 
     rail.innerHTML =
       editor +
@@ -390,25 +477,34 @@ const DASH_HTML = `<!doctype html>
         '<div class="group__hint">' + escHtml(SPECS.hero.label + ' · от ' + SPECS.hero.min + ' · до ' + SPECS.hero.max) + '</div>' +
         heroSlot +
       '</div>' +
-      '<div class="group">' +
+      '<div class="group" data-reorder="driver">' +
         '<div class="group__title"><b>Пилоты</b><span>' + state.drivers.length + '</span>' +
           '<button class="group__add" onclick="toggleNewForm(\\'driver\\')">+ Добавить</button>' +
         '</div>' +
-        '<div class="group__hint">' + escHtml(SPECS.driver.label + ' · от ' + SPECS.driver.min + ' · до ' + SPECS.driver.max) + '</div>' +
+        '<div class="group__hint">' + escHtml(SPECS.driver.label + ' · от ' + SPECS.driver.min + ' · перетащи строку чтобы поменять порядок') + '</div>' +
         driverNew + driverSlots +
       '</div>' +
-      '<div class="group">' +
+      '<div class="group" data-reorder="track">' +
         '<div class="group__title"><b>Трассы</b><span>' + state.tracks.length + '</span>' +
           '<button class="group__add" onclick="toggleNewForm(\\'track\\')">+ Добавить</button>' +
         '</div>' +
-        '<div class="group__hint">' + escHtml(SPECS.track.label + ' · от ' + SPECS.track.min + ' · до ' + SPECS.track.max) + '</div>' +
+        '<div class="group__hint">' + escHtml(SPECS.track.label + ' · от ' + SPECS.track.min) + '</div>' +
         trackNew + trackSlots +
+      '</div>' +
+      '<div class="group" data-reorder="car">' +
+        '<div class="group__title"><b>Машины команды</b><span>' + state.cars.length + '</span>' +
+          '<button class="group__add" onclick="toggleNewForm(\\'car\\')">+ Добавить</button>' +
+        '</div>' +
+        '<div class="group__hint">' + escHtml(SPECS.car.label + ' · от ' + SPECS.car.min) + '</div>' +
+        carNew + carSlots +
       '</div>' +
       '<div class="group">' +
         '<div class="group__title"><b>Галерея</b><span>' + state.gallery.length + ' файлов</span></div>' +
         '<div class="group__hint">' + escHtml(SPECS.gallery.note + ' · ' + SPECS.gallery.max) + '</div>' +
         gallerySection +
       '</div>';
+
+    if (state.cropper) showCropper();
   }
 
   function toggleNewForm(kind) {
@@ -431,6 +527,137 @@ const DASH_HTML = `<!doctype html>
         '<button class="primary" onclick="createDriver()">Добавить</button>' +
       '</div>' +
     '</div>';
+  }
+
+  function renderCarForm() {
+    return '<div class="new-form">' +
+      '<h4>Новая машина команды</h4>' +
+      '<div class="row full"><div><label>Название/модель</label><input id="nf-cname" placeholder="Toyota GR Corolla #02"></div></div>' +
+      '<div class="row"><div><label>Пилот</label><input id="nf-cdriver" placeholder="James Deane"></div>' +
+                       '<div><label>Двигатель</label><input id="nf-cengine" placeholder="2JZ-GTE"></div></div>' +
+      '<div class="row"><div><label>HP</label><input id="nf-chp" type="number" placeholder="900"></div>' +
+                       '<div><label>Ливрея</label><input id="nf-clivery" placeholder="Dark Force livery"></div></div>' +
+      '<div class="row full"><div><label>Заметки</label><input id="nf-cnotes" placeholder="свежий билд"></div></div>' +
+      '<div class="actions">' +
+        '<button onclick="toggleNewForm(\\'car\\')">Отмена</button>' +
+        '<button class="primary" onclick="createCar()">Добавить</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  async function createCar() {
+    const body = {
+      name: document.getElementById('nf-cname').value.trim(),
+      driver: document.getElementById('nf-cdriver').value.trim(),
+      engine: document.getElementById('nf-cengine').value.trim(),
+      hp: document.getElementById('nf-chp').value.trim(),
+      livery: document.getElementById('nf-clivery').value.trim(),
+      notes: document.getElementById('nf-cnotes').value.trim(),
+    };
+    if (!body.name) { toast('Название обязательно'); return; }
+    const r = await fetch('/admin/api/cars', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) { toast('Ошибка: ' + r.status); return; }
+    state.newForm = null;
+    toast('Машина добавлена');
+    await loadAll();
+    refreshFrame();
+  }
+
+  function openEditEntity(kind, id) {
+    state.editEntity = { kind, id };
+    state.activeSlot = null;
+    renderRail();
+    const rail = document.getElementById('rail'); if (rail) rail.scrollTop = 0;
+  }
+  function closeEditEntity() {
+    state.editEntity = null;
+    renderRail();
+  }
+  function renderEditEntityForm() {
+    const { kind, id } = state.editEntity;
+    let entity = null;
+    if (kind === 'driver') entity = state.drivers.find((x) => String(x.rank) === String(id));
+    if (kind === 'track') entity = state.tracks.find((x) => String(x.slug) === String(id));
+    if (kind === 'car') entity = state.cars.find((x) => String(x.id) === String(id));
+    if (!entity) { state.editEntity = null; return ''; }
+    const fields = (kind === 'driver') ? [
+      ['name', 'Имя', entity.name, false],
+      ['country', 'Страна', entity.country, false],
+      ['flag', 'Флаг', entity.flag || '', false],
+      ['car', 'Машина', entity.car || '', true],
+      ['engine', 'Двигатель', entity.engine || '', false],
+      ['hp', 'HP', entity.hp || '', false, 'number'],
+      ['instagram', 'Instagram', entity.instagram || '', true],
+    ] : (kind === 'track') ? [
+      ['name', 'Название', entity.name, true],
+      ['city', 'Город', entity.city || '', false],
+      ['country', 'Страна', entity.country || '', false],
+      ['region', 'Регион', entity.region || '', false],
+      ['level', 'Уровень', entity.level || '', false],
+      ['description', 'Описание', entity.description || '', true],
+      ['mapsUrl', 'Google Maps URL', entity.mapsUrl || '', true],
+      ['website', 'Сайт трассы', entity.website || '', true],
+    ] : [
+      ['name', 'Название/модель', entity.name, true],
+      ['driver', 'Пилот', entity.driver || '', false],
+      ['engine', 'Двигатель', entity.engine || '', false],
+      ['hp', 'HP', entity.hp || '', false, 'number'],
+      ['livery', 'Ливрея', entity.livery || '', false],
+      ['notes', 'Заметки', entity.notes || '', true],
+    ];
+    const rows = fields.map((f) => {
+      const [name, label, value, full, type] = f;
+      return '<div class="row ' + (full ? 'full' : '') + '"><div><label>' + escHtml(label) + '</label>' +
+        '<input data-edit-field="' + name + '" type="' + (type || 'text') + '" value="' + escHtml(String(value)) + '"></div></div>';
+    }).join('');
+    const titleByKind = { driver: 'пилота', track: 'трассу', car: 'машину' };
+    return '<div class="new-form">' +
+      '<h4>Редактировать ' + titleByKind[kind] + '</h4>' +
+      rows +
+      '<div class="actions">' +
+        '<button onclick="closeEditEntity()">Отмена</button>' +
+        '<button class="primary" onclick="saveEditEntity()">Сохранить</button>' +
+      '</div>' +
+    '</div>';
+  }
+  async function saveEditEntity() {
+    const { kind, id } = state.editEntity;
+    const body = {};
+    document.querySelectorAll('[data-edit-field]').forEach((el) => {
+      body[el.getAttribute('data-edit-field')] = el.value;
+    });
+    const url = kind === 'driver' ? '/admin/api/drivers/' + id
+              : kind === 'track' ? '/admin/api/tracks/' + encodeURIComponent(id)
+              : '/admin/api/cars/' + id;
+    const r = await fetch(url, {
+      method: 'PATCH', credentials: 'same-origin',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) { toast('Ошибка: ' + r.status); return; }
+    state.editEntity = null;
+    toast('Сохранено');
+    await loadAll();
+    refreshFrame();
+  }
+
+  // Drag-reorder: track which slot is being dragged so the drop handler can
+  // either accept a re-order (same kind) or a file (cross-kind).
+  let reorderState = null;
+  function onSlotReorderStart(e, kind, id) {
+    reorderState = { kind, id: String(id) };
+    e.currentTarget.classList.add('drag-source');
+    e.dataTransfer.effectAllowed = 'move';
+    // Provide a dummy data payload so Firefox treats it as a real drag
+    try { e.dataTransfer.setData('text/plain', kind + ':' + id); } catch (err) {}
+  }
+  function onSlotReorderEnd(e) {
+    e.currentTarget.classList.remove('drag-source');
+    document.querySelectorAll('.slot.drag-target').forEach((el) => el.classList.remove('drag-target'));
   }
 
   function renderTrackForm() {
@@ -516,11 +743,20 @@ const DASH_HTML = `<!doctype html>
     const isActive = state.activeSlot === id;
     const thumbStyle = photoUrl ? 'background-image:url(' + escHtml(photoUrl) + '?v=' + Date.now() + ')' : '';
     const pickLabel = hasPhoto ? 'Заменить' : 'Загрузить';
+    const editable = entityKind === 'driver' || entityKind === 'track' || entityKind === 'car';
+    const draggable = editable;
     const removeBtn = (entityKind && entityId !== undefined)
       ? '<button class="slot__del" title="Удалить целиком" onclick="deleteEntity(\\'' + entityKind + '\\',\\'' + entityId + '\\')">✕</button>'
       : (hasPhoto ? '<button class="slot__del" title="Удалить фото" onclick="deleteFromSlot(\\'' + id + '\\')">×</button>' : '');
-    return '<div class="slot ' + (isActive ? 'active' : '') + '" data-slotid="' + id + '" ' +
-        'ondragover="onSlotDragOver(event,this)" ondragleave="onSlotDragLeave(this)" ondrop="onSlotDrop(event,\\'' + id + '\\')">' +
+    const editBtn = editable
+      ? '<button class="slot__edit" onclick="openEditEntity(\\'' + entityKind + '\\',\\'' + entityId + '\\')">Текст</button>'
+      : '';
+    const cropBtn = hasPhoto
+      ? '<button class="slot__crop" onclick="openCropper(\\'' + id + '\\')">Кадр</button>'
+      : '';
+    return '<div class="slot ' + (isActive ? 'active' : '') + '" data-slotid="' + id + '"' +
+        (draggable ? ' draggable="true" ondragstart="onSlotReorderStart(event,\\'' + entityKind + '\\',\\'' + entityId + '\\')" ondragend="onSlotReorderEnd(event)"' : '') +
+        ' ondragover="onSlotDragOver(event,this)" ondragleave="onSlotDragLeave(this)" ondrop="onSlotDrop(event,\\'' + id + '\\',\\'' + (entityKind || '') + '\\',\\'' + (entityId !== undefined ? entityId : '') + '\\')">' +
       '<div class="slot__thumb' + (hasPhoto ? '' : ' empty') + '" style="' + thumbStyle + '" onclick="selectSlot(\\'' + id + '\\')"></div>' +
       '<div class="slot__body" onclick="selectSlot(\\'' + id + '\\')">' +
         '<div class="slot__name">' + escHtml(name) + '</div>' +
@@ -528,9 +764,11 @@ const DASH_HTML = `<!doctype html>
         '<div class="slot__status ' + (hasPhoto ? 'has' : '') + '">' + (hasPhoto ? '✓ фото загружено' : 'фото не загружено') + '</div>' +
       '</div>' +
       '<div class="slot__act">' +
+        editBtn +
         '<label class="slot__pick">' + pickLabel +
           '<input type="file" accept="image/*" onchange="uploadFromSlot(\\'' + id + '\\', this)">' +
         '</label>' +
+        cropBtn +
         removeBtn +
       '</div>' +
       '<div class="slot__bar"><i></i></div>' +
@@ -661,19 +899,262 @@ const DASH_HTML = `<!doctype html>
 
   function onSlotDragOver(e, el) {
     e.preventDefault();
-    if (e.dataTransfer && Array.from(e.dataTransfer.items || []).some((it) => it.kind === 'file')) {
+    if (reorderState) {
+      // Inter-slot reorder drag
+      const tk = el.getAttribute('data-slotid');
+      if (tk && tk.startsWith(reorderState.kind + '-')) el.classList.add('drag-target');
+    } else if (e.dataTransfer && Array.from(e.dataTransfer.items || []).some((it) => it.kind === 'file')) {
       el.classList.add('over');
     }
   }
-  function onSlotDragLeave(el) { el.classList.remove('over'); }
-  async function onSlotDrop(e, slotId) {
+  function onSlotDragLeave(el) {
+    el.classList.remove('over');
+    el.classList.remove('drag-target');
+  }
+  async function onSlotDrop(e, slotId, dropKind, dropId) {
     e.preventDefault();
     const slotEl = document.querySelector('.slot[data-slotid="' + slotId + '"]');
-    if (slotEl) slotEl.classList.remove('over');
+    if (slotEl) { slotEl.classList.remove('over'); slotEl.classList.remove('drag-target'); }
+    // Reorder takes precedence over file-drop when a slot is being dragged.
+    if (reorderState && dropKind === reorderState.kind && dropId !== reorderState.id) {
+      await applyReorder(reorderState.kind, reorderState.id, String(dropId));
+      reorderState = null;
+      return;
+    }
+    reorderState = null;
     const files = e.dataTransfer && e.dataTransfer.files;
     if (!files || !files[0]) return;
     const bar = slotEl ? slotEl.querySelector('.slot__bar') : null;
     await uploadFile(slotId, files[0], bar);
+  }
+  async function applyReorder(kind, draggedId, targetId) {
+    // Build new order: take current order, move dragged before target
+    const arr = kind === 'driver' ? state.drivers
+              : kind === 'track' ? state.tracks
+              : state.cars;
+    const idKey = kind === 'driver' ? 'rank' : kind === 'track' ? 'slug' : 'id';
+    const ids = arr.map((x) => String(x[idKey]));
+    const fromIdx = ids.indexOf(String(draggedId));
+    const toIdx = ids.indexOf(String(targetId));
+    if (fromIdx === -1 || toIdx === -1) return;
+    const moved = ids.splice(fromIdx, 1)[0];
+    ids.splice(toIdx, 0, moved);
+    const r = await fetch('/admin/api/reorder', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kind, ids }),
+    });
+    if (!r.ok) { toast('Ошибка перестановки: ' + r.status); return; }
+    toast('Порядок изменён');
+    await loadAll();
+    refreshFrame();
+  }
+
+  // ---------- Cropper ----------
+  function openCropper(slotId) {
+    const k = kindForSlot(slotId);
+    let entity = null;
+    if (k === 'hero') entity = state.eventPoster || {};
+    else if (k === 'driver') {
+      const rank = parseInt(slotId.slice(7), 10);
+      entity = state.drivers.find((x) => x.rank === rank);
+    } else if (k === 'track') {
+      const slug = slotId.slice(6);
+      entity = state.tracks.find((x) => x.slug === slug);
+    } else if (k === 'car') {
+      const id = parseInt(slotId.slice(4), 10);
+      entity = state.cars.find((x) => x.id === id);
+    }
+    if (!entity || !entity.photo) { toast('Сначала загрузи фото'); return; }
+    const focal = entity.photoFocal || { x: 50, y: 50, zoom: 1 };
+    state.cropper = {
+      slotId,
+      kind: k,
+      photoUrl: entity.photo,
+      x: focal.x, y: focal.y, zoom: focal.zoom,
+      origX: focal.x, origY: focal.y, origZoom: focal.zoom,
+    };
+    renderRail();
+  }
+  function closeCropper() {
+    if (state.cropper) {
+      // Roll back preview in the iframe to the saved state.
+      postFocalPreview(state.cropper.slotId, state.cropper.origX, state.cropper.origY, state.cropper.origZoom);
+    }
+    state.cropper = null;
+    renderRail();
+  }
+  function postFocalPreview(slotId, x, y, zoom) {
+    try {
+      document.getElementById('frame').contentWindow.postMessage(
+        { type: '__focal_preview', slot: slotId, x, y, zoom }, '*'
+      );
+    } catch (e) {}
+  }
+
+  function showCropper() {
+    const c = state.cropper;
+    const aspect = (SPECS[c.kind] || SPECS.driver).aspect;
+    let backdrop = document.getElementById('crop-modal');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'crop-modal';
+      backdrop.className = 'modal-back';
+      document.body.appendChild(backdrop);
+    }
+    backdrop.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>Кадрирование фото</h3>' +
+        '<div class="req">Перетащи фото внутри рамки чтобы сместить, ползунком — приблизь. Соотношение рамки совпадает с тем, как карточка показана на сайте.</div>' +
+        '<div class="crop-frame-wrap">' +
+          '<div class="crop-frame" id="crop-frame" style="aspect-ratio:' + aspect + '; width: min(560px, 100%);">' +
+            '<div class="crop-img" id="crop-img" style="background-image:url(' + escHtml(c.photoUrl) + ');"></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="crop-row"><label>X (←→)</label><input type="range" id="crop-x" min="0" max="100" step="1" value="' + c.x + '"><span class="v" id="crop-xv">' + Math.round(c.x) + '%</span></div>' +
+        '<div class="crop-row"><label>Y (↑↓)</label><input type="range" id="crop-y" min="0" max="100" step="1" value="' + c.y + '"><span class="v" id="crop-yv">' + Math.round(c.y) + '%</span></div>' +
+        '<div class="crop-row"><label>Зум</label><input type="range" id="crop-zoom" min="1" max="3" step="0.05" value="' + c.zoom + '"><span class="v" id="crop-zv">' + c.zoom.toFixed(2) + '×</span></div>' +
+        '<div class="modal__actions">' +
+          '<button class="ghost" onclick="resetCropper()">Сбросить</button>' +
+          '<button onclick="closeCropper()">Отмена</button>' +
+          '<button class="primary" onclick="saveCropper()">Сохранить</button>' +
+        '</div>' +
+      '</div>';
+
+    applyCropPreview();
+
+    // Sliders
+    document.getElementById('crop-x').addEventListener('input', (e) => { state.cropper.x = +e.target.value; applyCropPreview(); });
+    document.getElementById('crop-y').addEventListener('input', (e) => { state.cropper.y = +e.target.value; applyCropPreview(); });
+    document.getElementById('crop-zoom').addEventListener('input', (e) => { state.cropper.zoom = +e.target.value; applyCropPreview(); });
+
+    // Drag-pan
+    const img = document.getElementById('crop-img');
+    const frame = document.getElementById('crop-frame');
+    let dragStart = null;
+    img.addEventListener('mousedown', (e) => {
+      dragStart = { startX: e.clientX, startY: e.clientY, x: state.cropper.x, y: state.cropper.y };
+      img.classList.add('dragging');
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragStart) return;
+      const rect = frame.getBoundingClientRect();
+      // Drag right => focal moves left (so what's visible on left appears).
+      const dx = (e.clientX - dragStart.startX) / rect.width * 100;
+      const dy = (e.clientY - dragStart.startY) / rect.height * 100;
+      state.cropper.x = Math.max(0, Math.min(100, dragStart.x - dx));
+      state.cropper.y = Math.max(0, Math.min(100, dragStart.y - dy));
+      document.getElementById('crop-x').value = Math.round(state.cropper.x);
+      document.getElementById('crop-y').value = Math.round(state.cropper.y);
+      applyCropPreview();
+    });
+    window.addEventListener('mouseup', () => {
+      if (dragStart) { img.classList.remove('dragging'); dragStart = null; }
+    });
+    // Wheel zoom
+    frame.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = -e.deltaY / 500;
+      state.cropper.zoom = Math.max(1, Math.min(3, state.cropper.zoom + delta));
+      document.getElementById('crop-zoom').value = state.cropper.zoom;
+      applyCropPreview();
+    }, { passive: false });
+  }
+  function applyCropPreview() {
+    const c = state.cropper;
+    const img = document.getElementById('crop-img'); if (!img) return;
+    img.style.backgroundPosition = c.x + '% ' + c.y + '%';
+    img.style.transform = 'scale(' + c.zoom + ')';
+    img.style.transformOrigin = c.x + '% ' + c.y + '%';
+    document.getElementById('crop-xv').textContent = Math.round(c.x) + '%';
+    document.getElementById('crop-yv').textContent = Math.round(c.y) + '%';
+    document.getElementById('crop-zv').textContent = c.zoom.toFixed(2) + '×';
+    // Push preview into iframe so the user sees the change live.
+    postFocalPreview(c.slotId, c.x, c.y, c.zoom);
+  }
+  function resetCropper() {
+    state.cropper.x = 50;
+    state.cropper.y = 50;
+    state.cropper.zoom = 1;
+    document.getElementById('crop-x').value = 50;
+    document.getElementById('crop-y').value = 50;
+    document.getElementById('crop-zoom').value = 1;
+    applyCropPreview();
+  }
+  async function saveCropper() {
+    const c = state.cropper;
+    const r = await fetch('/admin/api/save-focal', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ slot: c.slotId, x: c.x, y: c.y, zoom: c.zoom }),
+    });
+    if (!r.ok) { toast('Ошибка: ' + r.status); return; }
+    toast('Кадр сохранён');
+    state.cropper = null;
+    document.getElementById('crop-modal')?.remove();
+    await loadAll();
+    refreshFrame();
+  }
+  // Make these visible to onclick="" handlers in the inline modal markup.
+  window.closeCropper = closeCropper;
+  window.resetCropper = resetCropper;
+  window.saveCropper = saveCropper;
+  window.openCropper = openCropper;
+  window.openEditEntity = openEditEntity;
+  window.closeEditEntity = closeEditEntity;
+  window.saveEditEntity = saveEditEntity;
+  window.createCar = createCar;
+  window.onSlotReorderStart = onSlotReorderStart;
+  window.onSlotReorderEnd = onSlotReorderEnd;
+  window.publishDraft = publishDraft;
+  window.discardDraft = discardDraft;
+  window.refreshPublishStatus = refreshPublishStatus;
+
+  // ---------- Publish/Draft ----------
+  async function refreshPublishStatus() {
+    const res = await api('/admin/api/publish-status');
+    if (!res) return;
+    const top = document.querySelector('.top');
+    let bar = document.getElementById('pubbar');
+    const hasChanges = res.dirty;
+    const label = hasChanges
+      ? '<b>' + res.changeCount + '</b> ' + (res.changeCount === 1 ? 'изменение' : 'изменений') + ' в черновике'
+      : 'Черновик опубликован';
+    const rail = document.getElementById('rail');
+    if (!rail) return;
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'pubbar';
+      bar.className = 'pub';
+      rail.insertBefore(bar, rail.firstChild);
+    } else if (bar.parentNode !== rail) {
+      rail.insertBefore(bar, rail.firstChild);
+    }
+    bar.innerHTML =
+      '<div class="pub__row">' +
+        '<div class="pub__count">' + label + '</div>' +
+        (hasChanges ? '<button class="pub__btn--ghost pub__btn" onclick="discardDraft()">Откатить</button>' : '') +
+        '<button class="pub__btn" ' + (hasChanges ? '' : 'disabled') + ' onclick="publishDraft()">Опубликовать</button>' +
+      '</div>';
+  }
+  async function publishDraft() {
+    if (!confirm('Опубликовать черновик? После этого изменения попадут на сайт.')) return;
+    const r = await fetch('/admin/api/publish', { method: 'POST', credentials: 'same-origin' });
+    if (!r.ok) { toast('Ошибка: ' + r.status); return; }
+    toast('Опубликовано');
+    await loadAll();
+    await refreshPublishStatus();
+    refreshFrame();
+  }
+  async function discardDraft() {
+    if (!confirm('Откатить черновик к опубликованной версии? Все несохранённые правки пропадут.')) return;
+    const r = await fetch('/admin/api/discard-draft', { method: 'POST', credentials: 'same-origin' });
+    if (!r.ok) { toast('Ошибка: ' + r.status); return; }
+    toast('Черновик откатан');
+    await loadAll();
+    await refreshPublishStatus();
+    refreshFrame();
   }
 
   async function saveHeroFields() {
@@ -765,6 +1246,7 @@ app.get("/admin/api/all", { preHandler: requireAuth }, async () => {
   return {
     drivers: data.drivers || [],
     tracks: data.tracks || [],
+    cars: data.cars || [],
     eventPoster: data.eventPoster || {},
     gallery,
   };
@@ -788,6 +1270,12 @@ function resolveSlot(slotId, data) {
     const tr = (data.tracks || []).find((x) => x.slug === slug);
     if (!tr) return null;
     return { kind: "track", dirName: "tracks", target: tr, photoPrefix: "/photos/tracks/" };
+  }
+  if (slotId.startsWith("car-")) {
+    const id = parseInt(slotId.slice(4), 10);
+    const car = (data.cars || []).find((x) => x.id === id);
+    if (!car) return null;
+    return { kind: "car", dirName: "cars", target: car, photoPrefix: "/photos/cars/" };
   }
   return null;
 }
@@ -837,7 +1325,7 @@ app.post("/admin/api/upload-slot", { preHandler: requireAuth }, async (req, repl
   slot.target.photo = `${slot.photoPrefix}${fname}`;
 
   await writeJson(DRIFT_DATA, data);
-  await syncDriftDataJs(data);
+  // (draft only — public sync deferred to /admin/api/publish)
   await logUpload(req.adminUser, slot.kind + "-photo", slotId, fname, fileBuf.length);
   return { ok: true, url: slot.target.photo };
 });
@@ -853,7 +1341,7 @@ app.post("/admin/api/delete-slot", { preHandler: requireAuth }, async (req, repl
   }
   slot.target.photo = null;
   await writeJson(DRIFT_DATA, data);
-  await syncDriftDataJs(data);
+  // (draft only — public sync deferred to /admin/api/publish)
   return { ok: true };
 });
 
@@ -880,7 +1368,7 @@ app.post("/admin/api/drivers", { preHandler: requireAuth }, async (req, reply) =
   };
   data.drivers.push(driver);
   await writeJson(DRIFT_DATA, data);
-  await syncDriftDataJs(data);
+  // (draft only — public sync deferred to /admin/api/publish)
   return driver;
 });
 
@@ -896,7 +1384,7 @@ app.delete("/admin/api/drivers/:rank", { preHandler: requireAuth }, async (req, 
   }
   data.drivers.splice(idx, 1);
   await writeJson(DRIFT_DATA, data);
-  await syncDriftDataJs(data);
+  // (draft only — public sync deferred to /admin/api/publish)
   return { ok: true };
 });
 
@@ -927,7 +1415,7 @@ app.post("/admin/api/tracks", { preHandler: requireAuth }, async (req, reply) =>
   };
   data.tracks.push(track);
   await writeJson(DRIFT_DATA, data);
-  await syncDriftDataJs(data);
+  // (draft only — public sync deferred to /admin/api/publish)
   return track;
 });
 
@@ -943,7 +1431,146 @@ app.delete("/admin/api/tracks/:slug", { preHandler: requireAuth }, async (req, r
   }
   data.tracks.splice(idx, 1);
   await writeJson(DRIFT_DATA, data);
-  await syncDriftDataJs(data);
+  // (draft only — public sync deferred to /admin/api/publish)
+  return { ok: true };
+});
+
+// Pan / zoom data for one slot. x and y are 0..100 (% within the photo
+// where the focal point sits). zoom is 1..3 (1 = cover-default).
+app.post("/admin/api/save-focal", { preHandler: requireAuth }, async (req, reply) => {
+  const { slot: slotId, x, y, zoom } = req.body ?? {};
+  if (!slotId) return reply.code(400).send({ error: "slot required" });
+  const xNum = Math.max(0, Math.min(100, Number(x) || 50));
+  const yNum = Math.max(0, Math.min(100, Number(y) || 50));
+  const zNum = Math.max(1, Math.min(3, Number(zoom) || 1));
+  const data = await readJson(DRIFT_DATA, {});
+  const slot = resolveSlot(slotId, data);
+  if (!slot) return reply.code(404).send({ error: "slot not found" });
+  slot.target.photoFocal = { x: xNum, y: yNum, zoom: zNum };
+  await writeJson(DRIFT_DATA, data);
+  // (draft only — public sync deferred to /admin/api/publish)
+  return { ok: true };
+});
+
+// In-place edit of a driver's text fields.
+app.patch("/admin/api/drivers/:rank", { preHandler: requireAuth }, async (req, reply) => {
+  const rank = parseInt(req.params.rank, 10);
+  if (!Number.isFinite(rank)) return reply.code(400).send({ error: "bad rank" });
+  const data = await readJson(DRIFT_DATA, {});
+  const dr = (data.drivers || []).find((x) => x.rank === rank);
+  if (!dr) return reply.code(404).send({ error: "not found" });
+  const b = req.body ?? {};
+  if (b.name !== undefined) dr.name = String(b.name).slice(0, 80);
+  if (b.country !== undefined) dr.country = String(b.country).slice(0, 80);
+  if (b.flag !== undefined) dr.flag = b.flag ? String(b.flag).slice(0, 16) : null;
+  if (b.car !== undefined) dr.car = String(b.car).slice(0, 120);
+  if (b.engine !== undefined) dr.engine = String(b.engine).slice(0, 80);
+  if (b.hp !== undefined) dr.hp = Number(b.hp) || 0;
+  if (b.instagram !== undefined) dr.instagram = b.instagram ? String(b.instagram).slice(0, 80) : null;
+  await writeJson(DRIFT_DATA, data);
+  // (draft only — public sync deferred to /admin/api/publish)
+  return dr;
+});
+
+app.patch("/admin/api/tracks/:slug", { preHandler: requireAuth }, async (req, reply) => {
+  const slug = req.params.slug;
+  const data = await readJson(DRIFT_DATA, {});
+  const tr = (data.tracks || []).find((x) => x.slug === slug);
+  if (!tr) return reply.code(404).send({ error: "not found" });
+  const b = req.body ?? {};
+  if (b.name !== undefined) tr.name = String(b.name).slice(0, 120);
+  if (b.country !== undefined) tr.country = String(b.country).slice(0, 80);
+  if (b.region !== undefined) tr.region = String(b.region).slice(0, 80);
+  if (b.city !== undefined) tr.city = String(b.city).slice(0, 80);
+  if (b.level !== undefined) tr.level = String(b.level).slice(0, 32);
+  if (b.description !== undefined) tr.description = String(b.description).slice(0, 400);
+  if (b.mapsUrl !== undefined) tr.mapsUrl = b.mapsUrl ? String(b.mapsUrl).slice(0, 400) : null;
+  if (b.website !== undefined) tr.website = b.website ? String(b.website).slice(0, 400) : null;
+  await writeJson(DRIFT_DATA, data);
+  // (draft only — public sync deferred to /admin/api/publish)
+  return tr;
+});
+
+// Re-order an array (drivers / tracks / cars). Body: { kind, ids: [...] }
+// where ids are the entity ids in the desired order. For drivers ids are
+// ranks (numeric), for tracks they are slugs, for cars ids are numeric.
+app.post("/admin/api/reorder", { preHandler: requireAuth }, async (req, reply) => {
+  const { kind, ids } = req.body ?? {};
+  if (!["driver", "track", "car"].includes(kind) || !Array.isArray(ids)) {
+    return reply.code(400).send({ error: "bad params" });
+  }
+  const arrName = kind === "driver" ? "drivers" : kind === "track" ? "tracks" : "cars";
+  const idKey = kind === "driver" ? "rank" : kind === "track" ? "slug" : "id";
+  const data = await readJson(DRIFT_DATA, {});
+  const arr = data[arrName] || [];
+  const byId = new Map(arr.map((x) => [String(x[idKey]), x]));
+  const reordered = [];
+  for (const id of ids) {
+    const item = byId.get(String(id));
+    if (item) { reordered.push(item); byId.delete(String(id)); }
+  }
+  // Anything missing from `ids` (e.g. recently created) goes at the end.
+  for (const remaining of byId.values()) reordered.push(remaining);
+  data[arrName] = reordered;
+  await writeJson(DRIFT_DATA, data);
+  // (draft only — public sync deferred to /admin/api/publish)
+  return { ok: true };
+});
+
+// Cars: same shape as drivers in spirit. id is a small auto-incrementing
+// integer so slot ids stay short ("car-3").
+app.post("/admin/api/cars", { preHandler: requireAuth }, async (req, reply) => {
+  const b = req.body ?? {};
+  const name = String(b.name || "").trim();
+  if (!name) return reply.code(400).send({ error: "name required" });
+  const data = await readJson(DRIFT_DATA, {});
+  if (!Array.isArray(data.cars)) data.cars = [];
+  const nextId = data.cars.length ? Math.max(...data.cars.map((c) => c.id || 0)) + 1 : 1;
+  const car = {
+    id: nextId,
+    name: name.slice(0, 120),
+    driver: b.driver ? String(b.driver).slice(0, 80) : "",
+    engine: b.engine ? String(b.engine).slice(0, 80) : "",
+    hp: b.hp ? Number(b.hp) || 0 : 0,
+    livery: b.livery ? String(b.livery).slice(0, 80) : "",
+    notes: b.notes ? String(b.notes).slice(0, 240) : "",
+    photo: null,
+  };
+  data.cars.push(car);
+  await writeJson(DRIFT_DATA, data);
+  // (draft only — public sync deferred to /admin/api/publish)
+  return car;
+});
+
+app.patch("/admin/api/cars/:id", { preHandler: requireAuth }, async (req, reply) => {
+  const id = parseInt(req.params.id, 10);
+  const data = await readJson(DRIFT_DATA, {});
+  const car = (data.cars || []).find((x) => x.id === id);
+  if (!car) return reply.code(404).send({ error: "not found" });
+  const b = req.body ?? {};
+  if (b.name !== undefined) car.name = String(b.name).slice(0, 120);
+  if (b.driver !== undefined) car.driver = String(b.driver).slice(0, 80);
+  if (b.engine !== undefined) car.engine = String(b.engine).slice(0, 80);
+  if (b.hp !== undefined) car.hp = Number(b.hp) || 0;
+  if (b.livery !== undefined) car.livery = String(b.livery).slice(0, 80);
+  if (b.notes !== undefined) car.notes = String(b.notes).slice(0, 240);
+  await writeJson(DRIFT_DATA, data);
+  // (draft only — public sync deferred to /admin/api/publish)
+  return car;
+});
+
+app.delete("/admin/api/cars/:id", { preHandler: requireAuth }, async (req, reply) => {
+  const id = parseInt(req.params.id, 10);
+  const data = await readJson(DRIFT_DATA, {});
+  const idx = (data.cars || []).findIndex((x) => x.id === id);
+  if (idx === -1) return reply.code(404).send({ error: "not found" });
+  const car = data.cars[idx];
+  if (car.photo && car.photo.startsWith("/photos/cars/")) {
+    await unlink(join(PUB, car.photo)).catch(() => {});
+  }
+  data.cars.splice(idx, 1);
+  await writeJson(DRIFT_DATA, data);
+  // (draft only — public sync deferred to /admin/api/publish)
   return { ok: true };
 });
 
@@ -956,7 +1583,7 @@ app.post("/admin/api/save-hero-fields", { preHandler: requireAuth }, async (req,
   data.eventPoster.track = track || null;
   data.eventPoster.ctaUrl = ctaUrl || null;
   await writeJson(DRIFT_DATA, data);
-  await syncDriftDataJs(data);
+  // (draft only — public sync deferred to /admin/api/publish)
   return { ok: true };
 });
 
@@ -1003,9 +1630,53 @@ app.post("/admin/api/remove-gallery", { preHandler: requireAuth }, async (req, r
   return { ok: true };
 });
 
+// Admin reads draft data via this endpoint. Used by drift-data.js (sync XHR
+// when ?draft=1 is in the URL) so the admin's iframe preview shows the
+// pending state.
+app.get("/admin/api/drift-data-draft.json", { preHandler: requireAuth }, async (req, reply) => {
+  const data = await readJson(DRIFT_DATA_DRAFT, {});
+  reply.header("cache-control", "no-store").send(data);
+});
+
+// Quick diff between draft and published — counts differing entities so the
+// admin can show "N изменений в черновике".
+app.get("/admin/api/publish-status", { preHandler: requireAuth }, async () => {
+  const draft = await readJson(DRIFT_DATA_DRAFT, {});
+  const pub = await readJson(DRIFT_DATA_PUB, {});
+  if (JSON.stringify(draft) === JSON.stringify(pub)) return { dirty: false, changeCount: 0 };
+  let diffs = 0;
+  for (const k of ["drivers", "tracks", "cars"]) {
+    const da = draft[k] || []; const pa = pub[k] || [];
+    if (da.length !== pa.length) diffs += Math.abs(da.length - pa.length);
+    const minLen = Math.min(da.length, pa.length);
+    for (let i = 0; i < minLen; i++) {
+      if (JSON.stringify(da[i]) !== JSON.stringify(pa[i])) diffs += 1;
+    }
+  }
+  if (JSON.stringify(draft.eventPoster || {}) !== JSON.stringify(pub.eventPoster || {})) diffs += 1;
+  return { dirty: true, changeCount: Math.max(diffs, 1) };
+});
+
+// Promote draft → published.
+app.post("/admin/api/publish", { preHandler: requireAuth }, async (req, reply) => {
+  const draft = await readJson(DRIFT_DATA_DRAFT, {});
+  await writeJson(DRIFT_DATA_PUB, draft);
+  await syncDriftDataJs(draft);
+  await logUpload(req.adminUser, "publish", "all", "drift-data.json", JSON.stringify(draft).length);
+  return { ok: true };
+});
+
+// Discard draft, restoring published state.
+app.post("/admin/api/discard-draft", { preHandler: requireAuth }, async (req, reply) => {
+  const pub = await readJson(DRIFT_DATA_PUB, {});
+  await writeJson(DRIFT_DATA_DRAFT, pub);
+  return { ok: true };
+});
+
 app.get("/admin/health", async () => ({ ok: true }));
 
 const start = async () => {
+  await ensureDraftExists();
   await app.listen({ port: PORT, host: "127.0.0.1" });
   console.log(`Dark Force admin listening on 127.0.0.1:${PORT}`);
 };

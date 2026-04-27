@@ -80,6 +80,63 @@
       b.classList.toggle('on', b.dataset.langSet === state.lang));
   });
 
+  // For every .ph.has-photo: convert the inline background-image to a CSS
+  // variable (--photo-url) and apply per-photo focal data (x/y/zoom) so the
+  // ::before pseudo-element handles pan/zoom without disturbing the
+  // element's own layout. The render JS in each variant page sets
+  // background-image inline; we run after DOMContentLoaded which fires
+  // after those inline scripts complete.
+  function applyFocals() {
+    var data = window.DRIFT_DATA || {};
+    document.querySelectorAll('.ph.has-photo').forEach(function (el) {
+      if (!el.style.getPropertyValue('--photo-url')) {
+        var bg = el.style.backgroundImage;
+        if (bg && bg !== 'none') el.style.setProperty('--photo-url', bg);
+      }
+      // Find the closest ancestor with data-slot to look up focal data.
+      var slotted = el.closest('[data-slot]');
+      var slot = slotted && slotted.getAttribute('data-slot');
+      var focal = lookupFocal(slot, data) || { x: 50, y: 50, zoom: 1 };
+      el.style.setProperty('--focal-x', focal.x + '%');
+      el.style.setProperty('--focal-y', focal.y + '%');
+      el.style.setProperty('--zoom', focal.zoom);
+    });
+  }
+  function lookupFocal(slot, data) {
+    if (!slot) return null;
+    if (slot === 'hero') return (data.eventPoster || {}).photoFocal || null;
+    if (slot.startsWith('driver-')) {
+      var rank = parseInt(slot.slice(7), 10);
+      var d = (data.drivers || []).find(function (x) { return x.rank === rank; });
+      return d ? d.photoFocal || null : null;
+    }
+    if (slot.startsWith('track-')) {
+      var slug = slot.slice(6);
+      var t = (data.tracks || []).find(function (x) { return x.slug === slug; });
+      return t ? t.photoFocal || null : null;
+    }
+    if (slot.startsWith('car-')) {
+      var idx = parseInt(slot.slice(4), 10);
+      var c = (data.cars || []).find(function (x) { return x.id === idx; });
+      return c ? c.photoFocal || null : null;
+    }
+    return null;
+  }
+  document.addEventListener('DOMContentLoaded', applyFocals);
+  // Re-apply when admin postMessages a focal update (so the iframe preview
+  // refreshes without a full reload while the admin is dragging the photo).
+  window.addEventListener('message', (ev) => {
+    if (ev.data && ev.data.type === '__focal_preview' && ev.data.slot) {
+      var slotted = document.querySelector('[data-slot="' + ev.data.slot + '"]');
+      if (!slotted) return;
+      var ph = slotted.querySelector('.ph.has-photo');
+      if (!ph) return;
+      ph.style.setProperty('--focal-x', ev.data.x + '%');
+      ph.style.setProperty('--focal-y', ev.data.y + '%');
+      ph.style.setProperty('--zoom', ev.data.zoom);
+    }
+  });
+
   // Inject mobile hamburger + drawer toggle into every .topbar
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.topbar').forEach((bar) => {

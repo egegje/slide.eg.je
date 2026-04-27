@@ -102,11 +102,23 @@
   </p>
 </section>
 
+<!-- CARS -->
+<section class="apex-section" id="apex-cars-section" style="display:none;padding-top:0">
+  <div class="apex-section__head">
+    <div>
+      <div class="no">02 / Garage</div>
+      <h2>Team cars</h2>
+    </div>
+    <div class="meta"><span id="apex-cars-count">—</span></div>
+  </div>
+  <div class="apex-drivers" id="apex-cars-list"></div>
+</section>
+
 <!-- CALENDAR -->
 <section class="apex-section" style="padding-top:0">
   <div class="apex-section__head">
     <div>
-      <div class="no">02 / Calendar</div>
+      <div class="no">03 / Calendar</div>
       <h2>Season 2026</h2>
     </div>
     <div class="meta">
@@ -194,6 +206,29 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
         '</div>' +
       '</div>';
   }).join('');
+
+  // Team cars — same card styling as drivers, hidden until at least one
+  // car exists in the data.
+  var cars = data.cars || [];
+  var carHost = document.getElementById('apex-cars-list');
+  var carSection = document.getElementById('apex-cars-section');
+  if (carHost && cars.length) {
+    carSection.style.display = '';
+    document.getElementById('apex-cars-count').textContent = cars.length + (cars.length === 1 ? ' car' : ' cars');
+    carHost.innerHTML = cars.map(function (c) {
+      var hp = c.hp ? c.hp + ' HP' : '';
+      var bottom = [c.engine, hp].filter(Boolean).join(' · ');
+      return '' +
+        '<div class="apex-driver" data-slot="car-' + esc(c.id) + '">' +
+          '<div class="ph' + (c.photo ? ' has-photo' : '') + '" style="position:absolute;inset:0' + (c.photo ? ';background-image:url(\'' + esc(c.photo) + '\');background-size:cover;background-position:center' : '') + '" data-label="CAR"></div>' +
+          '<div class="apex-driver__num">' + esc(c.id) + '</div>' +
+          '<div class="apex-driver__info">' +
+            '<div class="name">' + esc(c.name) + '</div>' +
+            '<div class="car">' + esc(bottom || c.driver || '') + '</div>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
 
   var ep = data.eventPoster || {};
   var hero = document.getElementById('apex-hero-event');

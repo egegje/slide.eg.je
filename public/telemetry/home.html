@@ -112,11 +112,23 @@
   <div class="tele-drivers" id="drivers-top"></div>
 </section>
 
+<!-- GARAGE -->
+<section class="tele-section" id="tele-cars-section" style="display:none;padding-top:0">
+  <div class="tele-section__head">
+    <div>
+      <div class="kicker">06 / GARAGE</div>
+      <h2>Team cars</h2>
+    </div>
+    <span id="tele-cars-count" style="color:var(--fg-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase">—</span>
+  </div>
+  <div class="tele-drivers" id="tele-cars-list"></div>
+</section>
+
 <!-- CALENDAR NOTE -->
 <section class="tele-section" style="padding-top:20px">
   <div class="tele-section__head">
     <div>
-      <div class="kicker">06 / SEASON</div>
+      <div class="kicker">07 / SEASON</div>
       <h2>Calendar</h2>
     </div>
     <a class="btn" href="calendar.html">Open calendar →</a>
@@ -179,6 +191,30 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
         '</div>' +
       '</div>';
   }).join('');
+
+  var cars = data.cars || [];
+  var carsHost = document.getElementById('tele-cars-list');
+  var carsSection = document.getElementById('tele-cars-section');
+  if (carsHost && cars.length) {
+    carsSection.style.display = '';
+    document.getElementById('tele-cars-count').textContent = cars.length + (cars.length === 1 ? ' CAR' : ' CARS');
+    carsHost.innerHTML = cars.map(function (c) {
+      var num = String(c.id).padStart(2, '0');
+      return '' +
+        '<div class="tele-driver" data-slot="car-' + esc(c.id) + '">' +
+          '<div class="tele-driver__img"><div class="ph' + (c.photo ? ' has-photo' : '') + '"' + (c.photo ? ' style="background-image:url(\'' + esc(c.photo) + '\');background-size:cover;background-position:center"' : '') + ' data-label="CAR"></div><div class="num">' + esc(num) + '</div></div>' +
+          '<div class="tele-driver__body">' +
+            '<div class="tele-driver__name">' + esc(c.name) + '</div>' +
+            '<div class="tele-driver__car">' + esc(c.driver || '—') + '</div>' +
+            '<div class="tele-driver__stats">' +
+              '<div><b>' + esc(c.hp || '—') + '</b>HP</div>' +
+              '<div><b>' + esc((c.engine || '').split(' ')[0] || '—') + '</b>ENG</div>' +
+              '<div><b>' + esc((c.livery || '').split(' ')[0] || '—') + '</b>LIVERY</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
 
   var ep = data.eventPoster || {};
   var feat = document.getElementById('tele-hero-feature');

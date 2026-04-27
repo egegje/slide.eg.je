@@ -104,10 +104,20 @@
   </div>
 </section>
 
+<!-- Garage -->
+<section class="pad-section" id="pad-cars-section" style="display:none;padding-top:0">
+  <div class="pad-section__head">
+    <span class="num">02</span>
+    <h2>Garage</h2>
+    <span class="meta" id="pad-cars-count">—</span>
+  </div>
+  <div class="pad-crew" id="pad-cars-list"></div>
+</section>
+
 <!-- Calendar -->
 <section class="pad-section" style="padding-top:0">
   <div class="pad-section__head">
-    <span class="num">02</span>
+    <span class="num">03</span>
     <h2>Season</h2>
     <span class="meta">AWAITING<br>DATA</span>
   </div>
@@ -191,6 +201,30 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
         '</div>' +
       '</div>';
   }).join('');
+
+  var cars = data.cars || [];
+  var carsHost = document.getElementById('pad-cars-list');
+  var carsSection = document.getElementById('pad-cars-section');
+  if (carsHost && cars.length) {
+    carsSection.style.display = '';
+    document.getElementById('pad-cars-count').textContent = cars.length + (cars.length === 1 ? ' CAR' : ' CARS');
+    carsHost.innerHTML = cars.map(function (c) {
+      var num = String(c.id).padStart(2, '0');
+      return '' +
+        '<div class="pad-crew__card" data-slot="car-' + esc(c.id) + '">' +
+          '<div class="pad-crew__img">' +
+            '<div class="ph' + (c.photo ? ' has-photo' : '') + '"' + (c.photo ? ' style="background-image:url(\'' + esc(c.photo) + '\');background-size:cover;background-position:center"' : '') + ' data-label="CAR"></div>' +
+            '<span class="pad-crew__tape">CAR</span>' +
+            '<span class="pad-crew__num">' + esc(num) + '</span>' +
+          '</div>' +
+          '<div class="pad-crew__body">' +
+            '<div class="pad-crew__country">' + esc(c.driver || '—') + '</div>' +
+            '<div class="pad-crew__name">' + esc(c.name) + '</div>' +
+            '<div class="pad-crew__car">' + esc(c.engine || '') + (c.hp ? ' · ' + c.hp + ' HP' : '') + '</div>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
 
   var ep = data.eventPoster || {};
   var hero = document.getElementById('pad-hero-event');
