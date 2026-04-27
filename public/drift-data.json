@@ -1,6 +1,29 @@
 {
   "drivers": [
     {
+      "rank": 4,
+      "name": "Vaughn Gittin Jr.",
+      "flag": "🇺🇸",
+      "country": "США",
+      "car": "Ford Mustang RTR Spec 5-D",
+      "engine": "Aluminator 5.2L V8",
+      "hp": 900,
+      "boost": "Roush Supercharger",
+      "diff": "Winters",
+      "tires": "Nitto NT555",
+      "titles": [
+        "FD 2010 — Ford Mustang S197"
+      ],
+      "tags": [
+        "champion",
+        "v8",
+        "usa"
+      ],
+      "category": "world",
+      "photo": null,
+      "instagram": null
+    },
+    {
       "rank": 3,
       "name": "Chris Forsberg",
       "flag": "🇺🇸",
@@ -19,29 +42,6 @@
         "champion",
         "usa",
         "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 4,
-      "name": "Vaughn Gittin Jr.",
-      "flag": "🇺🇸",
-      "country": "США",
-      "car": "Ford Mustang RTR Spec 5-D",
-      "engine": "Aluminator 5.2L V8",
-      "hp": 900,
-      "boost": "Roush Supercharger",
-      "diff": "Winters",
-      "tires": "Nitto NT555",
-      "titles": [
-        "FD 2010 — Ford Mustang S197"
-      ],
-      "tags": [
-        "champion",
-        "v8",
-        "usa"
       ],
       "category": "world",
       "photo": null,
@@ -633,5 +633,136 @@
     "track": null,
     "ctaUrl": null
   },
-  "cars": []
+  "cars": [
+    {
+      "name": "Nissan 370z «Pro»",
+      "color": "Yellow",
+      "driver": "",
+      "engine": "2JZ-GE VVTI Turbo",
+      "hp": 850,
+      "torque": "900 N·m",
+      "turbo": "Garrett G30-900",
+      "ecu": "Link G4X Fury",
+      "cage": "FIA Cage Kit",
+      "angleKit": "WiseFab",
+      "coilovers": "Feal",
+      "fuel": "Radium · E85",
+      "livery": "AutoWorldArt",
+      "notes": "Главная боевая машина команды. Конфигурация под Pro-уровень соревнований.",
+      "id": 1,
+      "photo": null
+    },
+    {
+      "name": "Nissan 370z «Drift Missile»",
+      "color": "Black",
+      "driver": "",
+      "engine": "VQ37VHR + Nitrous",
+      "hp": 400,
+      "torque": "380 N·m",
+      "turbo": "N/A",
+      "ecu": "OEM / EcuTech",
+      "cage": "—",
+      "angleKit": "GK Tech / Z1",
+      "coilovers": "BC Racing",
+      "fuel": "",
+      "livery": "",
+      "notes": "Атмосферный «снаряд» с закисью. Лёгкий, маневренный — для local-сессий и тренировок.",
+      "id": 2,
+      "photo": null
+    },
+    {
+      "name": "BMW e61 Drift Taxi",
+      "color": "",
+      "driver": "",
+      "engine": "LQ9 (V8 LS) + Compressor",
+      "hp": 660,
+      "torque": "700 N·m",
+      "turbo": "Magnuson Supercharger",
+      "ecu": "",
+      "cage": "Custom Rollcage",
+      "angleKit": "WiseFab",
+      "coilovers": "MaxSpeedPerformance",
+      "fuel": "E85",
+      "livery": "CIAY",
+      "notes": "Drift-taxi для гостевых заездов. MilSpec-проводка под нагрузки.",
+      "id": 3,
+      "photo": null
+    },
+    {
+      "name": "Chevrolet Corvette C6",
+      "color": "",
+      "driver": "",
+      "engine": "",
+      "hp": 0,
+      "torque": "",
+      "turbo": "",
+      "ecu": "",
+      "cage": "",
+      "angleKit": "",
+      "coilovers": "",
+      "fuel": "",
+      "livery": "",
+      "notes": "Технические детали уточняются.",
+      "id": 4,
+      "photo": null
+    },
+    {
+      "name": "BMW e36",
+      "color": "",
+      "driver": "",
+      "engine": "1JZ",
+      "hp": 550,
+      "torque": "600 N·m",
+      "turbo": "",
+      "ecu": "",
+      "cage": "FIA Cage",
+      "angleKit": "Maxicustom",
+      "coilovers": "BC Racing",
+      "fuel": "",
+      "livery": "",
+      "notes": "Классика swap-сцены: 1JZ под капотом, лёгкий кузов e36.",
+      "id": 5,
+      "photo": null
+    },
+    {
+      "name": "BMW e92",
+      "color": "",
+      "driver": "",
+      "engine": "2JZ",
+      "hp": 900,
+      "torque": "800 N·m",
+      "turbo": "",
+      "ecu": "Ecumaster Black",
+      "cage": "FIA Cage",
+      "angleKit": "WiseFab",
+      "coilovers": "Feal",
+      "fuel": "Radium",
+      "livery": "",
+      "notes": "Полный билд под Pro-Am: 2JZ свап, FIA-каркас, фабричная электроника Ecumaster.",
+      "id": 6,
+      "photo": null
+    }
+  ],
+  "team": {
+    "name": "Dark Force",
+    "fullName": "Dark Force Drift Team",
+    "founded": "Август 2022",
+    "based": "Майами, Флорида",
+    "slogans": [
+      "Get Dark",
+      "Unleash Your Demons"
+    ],
+    "intro": "Дрифт зародился в 1970-х в Японии — техника прохождения поворотов на грани сцепления, где контроль важнее скорости. Философия команды уходит к образу самураев: сила, дисциплина, честь, бесстрашие.",
+    "symbol": "Демоническая самурайская маска (менпо / Они). Снаружи — ярость, внутри — холодный расчёт. Дрифт — не потеря управления, а подчинение хаоса.",
+    "tagline": "Мы не убегаем от своих демонов — мы выпускаем их и управляем ими.",
+    "goals": [
+      "Formula Drift и местные соревнования",
+      "Локальные дрифт-сессии и car meets во Флориде",
+      "Дрифт-ивенты и шоу",
+      "Видео-контент и блог",
+      "Мерч и сувениры с символикой команды",
+      "Уроки дрифта",
+      "Уникальные технические решения и запчасти"
+    ]
+  }
 }

@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ru" data-variant="telemetry">
+<head>
+<meta charset="utf-8">
+<title>Team — Telemetry — drift.eg.je</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared.css">
+<link rel="stylesheet" href="telemetry.css">
+<style>
+  .tele-team-hero {
+    padding: 50px 24px 36px;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+  }
+  @media (max-width: 720px) { .tele-team-hero { grid-template-columns: 1fr; } }
+  .tele-team-hero__kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .tele-team-hero h1 {
+    font-family: var(--font-head);
+    font-size: clamp(48px, 9vw, 112px);
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+  .tele-team-hero h1 b { color: var(--accent); font-weight: inherit; }
+  .tele-team-hero__slogans {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px;
+  }
+  .tele-team-hero__slogans span {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg);
+    border: 1px solid var(--accent);
+    padding: 6px 10px;
+  }
+  .tele-team-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(110px, 1fr));
+    gap: 8px;
+  }
+  .tele-team-stats__cell {
+    border: 1px solid var(--line);
+    padding: 12px 16px;
+    background: var(--surface);
+  }
+  .tele-team-stats__cell b {
+    font-family: var(--font-head);
+    font-size: 28px;
+    line-height: 1;
+    display: block;
+    color: var(--fg);
+    margin-bottom: 4px;
+  }
+  .tele-team-stats__cell span {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+
+  .tele-team-concept {
+    padding: 40px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 720px) { .tele-team-concept { grid-template-columns: 1fr; } }
+  .tele-team-concept h3 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .tele-team-concept p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg-dim);
+  }
+
+  .tele-team-tagline {
+    padding: 50px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+  .tele-team-tagline blockquote {
+    font-family: var(--font-head);
+    font-size: clamp(22px, 3.5vw, 36px);
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .tele-team-tagline cite {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-style: normal;
+    display: block;
+    margin-top: 14px;
+  }
+
+  .tele-goals {
+    padding: 30px 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .tele-goals__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .tele-goals ul {
+    list-style: none;
+    padding: 0; margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--line);
+  }
+  .tele-goals li {
+    background: var(--bg);
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--fg);
+  }
+  .tele-goals li::before {
+    content: "→";
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  .tele-cars {
+    padding: 40px 24px 60px;
+  }
+  .tele-cars__head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 18px;
+  }
+  .tele-cars__head h2 {
+    font-family: var(--font-head);
+    font-size: 40px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .tele-cars__head .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .tele-car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+  }
+  .tele-car {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    transition: border-color .2s var(--ease);
+    display: flex; flex-direction: column;
+  }
+  .tele-car:hover { border-color: var(--accent); }
+  .tele-car__photo {
+    aspect-ratio: 4 / 3;
+    background: repeating-linear-gradient(115deg, oklch(0.22 0.015 250) 0 6px, oklch(0.19 0.015 250) 6px 12px);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 1px solid var(--line);
+  }
+  .tele-car__body { padding: 14px 16px; }
+  .tele-car__head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .tele-car__name {
+    font-family: var(--font-head);
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+  }
+  .tele-car__num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .tele-car__rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+  .tele-car__rows > div {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+  }
+  .tele-car__rows > div b {
+    display: block;
+    font-family: var(--font-head);
+    color: var(--fg);
+    font-size: 16px;
+    line-height: 1.1;
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+  .tele-car__notes {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--fg-dim);
+  }
+</style>
+</head><body class="tele-body">
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="../index.html">
+      <svg class="monster-head" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="var(--accent)" stroke="none"/>
+      </svg>
+      DRIFT<b>.EG.JE</b>
+    </a>
+    <nav class="nav">
+      <a href="home.html">Home</a>
+      <a class="active" href="team.html">Team</a>
+      <a href="drivers.html">Drivers</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="tracks.html">Tracks</a>
+      <a href="shop.html">Shop</a>
+    </nav>
+    <div class="topbar__right">
+      <a class="btn btn--primary" href="https://t.me/x7777708" target="_blank" rel="noopener">Join</a>
+    </div>
+  </div>
+</header>
+
+<section class="tele-team-hero">
+  <div>
+    <div class="tele-team-hero__kicker">Drift Team · Season 2026</div>
+    <h1 id="team-name">Dark <b>Force</b></h1>
+    <div class="tele-team-hero__slogans" id="team-slogans"></div>
+  </div>
+  <div class="tele-team-stats" id="team-stats"></div>
+</section>
+
+<section class="tele-team-concept">
+  <div>
+    <h3>Концепция</h3>
+    <p id="team-intro"></p>
+  </div>
+  <div>
+    <h3>Символ</h3>
+    <p id="team-symbol"></p>
+  </div>
+</section>
+
+<section class="tele-team-tagline">
+  <blockquote id="team-tagline"></blockquote>
+  <cite>Dark Force · Manifesto</cite>
+</section>
+
+<section class="tele-goals">
+  <div class="tele-goals__title">Activities</div>
+  <ul id="team-goals"></ul>
+</section>
+
+<section class="tele-cars">
+  <div class="tele-cars__head">
+    <h2>Garage</h2>
+    <div class="meta"><span id="cars-count">— cars</span></div>
+  </div>
+  <div class="tele-car-grid" id="cars-grid"></div>
+</section>
+
+<footer class="tele-footer">
+  <div class="tele-footer__mono">
+    <span>© 2026 DRIFT.EG.JE</span>
+    <span>Telemetry variant · team</span>
+  </div>
+</footer>
+
+<script>
+window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
+  "accent": "orange",
+  "density": "comfy",
+  "motion": true,
+  "hero": "video",
+  "lang": "ru"
+}/*EDITMODE-END*/;
+</script>
+<script src="../drift-data.js"></script>
+<script src="../shared.js"></script>
+<script>
+(function () {
+  function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+  var data = window.DRIFT_DATA || {};
+  var team = data.team || {};
+
+  if (team.fullName || team.name) document.getElementById('team-name').innerHTML = esc(team.fullName || team.name);
+  document.getElementById('team-slogans').innerHTML = (team.slogans || []).map(function (s) {
+    return '<span>' + esc(s) + '</span>';
+  }).join('');
+
+  var stats = [
+    [team.founded || '—', 'Founded'],
+    [team.based || '—', 'Based'],
+    [(data.drivers || []).length, 'Drivers'],
+    [(data.cars || []).length, 'Cars'],
+  ];
+  document.getElementById('team-stats').innerHTML = stats.map(function (s) {
+    return '<div class="tele-team-stats__cell"><b>' + esc(s[0]) + '</b><span>' + esc(s[1]) + '</span></div>';
+  }).join('');
+
+  document.getElementById('team-intro').textContent = team.intro || '';
+  document.getElementById('team-symbol').textContent = team.symbol || '';
+  document.getElementById('team-tagline').innerHTML = team.tagline ? esc(team.tagline) : '';
+
+  document.getElementById('team-goals').innerHTML = (team.goals || []).map(function (g) {
+    return '<li>' + esc(g) + '</li>';
+  }).join('');
+
+  var cars = data.cars || [];
+  document.getElementById('cars-count').textContent = cars.length + (cars.length === 1 ? ' car' : ' cars');
+  document.getElementById('cars-grid').innerHTML = cars.map(function (c, i) {
+    var num = String(i + 1).padStart(2, '0');
+    var photoStyle = c.photo
+      ? 'background-image:url(\'' + esc(c.photo) + '\'); background-size:cover; background-position:center;'
+      : '';
+    var rows = [
+      ['HP', c.hp ? c.hp : '—'],
+      ['ENG', (c.engine || '—').split(' ')[0]],
+      ['CAGE', c.cage ? c.cage.split(' ')[0] : '—'],
+      ['ANGLE', c.angleKit ? c.angleKit.split(' ')[0] : '—'],
+    ];
+    var rowsHtml = rows.map(function (r) {
+      return '<div>' + esc(r[0]) + '<b>' + esc(r[1]) + '</b></div>';
+    }).join('');
+    return '' +
+      '<article class="tele-car" data-slot="car-' + esc(c.id) + '">' +
+        '<div class="tele-car__photo' + (c.photo ? ' has-photo' : ' ph') + '" style="' + photoStyle + '" data-label="CAR"></div>' +
+        '<div class="tele-car__body">' +
+          '<div class="tele-car__head">' +
+            '<div class="tele-car__name">' + esc(c.name) + '</div>' +
+            '<div class="tele-car__num">' + num + '</div>' +
+          '</div>' +
+          '<div class="tele-car__rows">' + rowsHtml + '</div>' +
+          (c.notes ? '<div class="tele-car__notes">' + esc(c.notes) + '</div>' : '') +
+        '</div>' +
+      '</article>';
+  }).join('');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ru" data-variant="apex">
+<head>
+<meta charset="utf-8">
+<title>Team — Apex — drift.eg.je</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared.css">
+<link rel="stylesheet" href="apex.css">
+<style>
+  .apex-team-hero {
+    padding: 80px 28px 60px;
+    max-width: 1240px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .apex-team-hero__kicker {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .apex-team-hero h1 {
+    font-family: var(--font-head);
+    font-size: clamp(64px, 12vw, 156px);
+    line-height: 0.92;
+    letter-spacing: 0.01em;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+  }
+  .apex-team-hero h1 b { color: var(--accent); font-weight: inherit; }
+  .apex-team-hero__slogans {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-top: 24px;
+  }
+  .apex-team-hero__slogan {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fg);
+    border: 1px solid var(--accent);
+    padding: 8px 14px;
+  }
+  .apex-team-hero__meta {
+    display: flex; flex-wrap: wrap; gap: 36px;
+    margin-top: 40px;
+    color: var(--fg-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .apex-team-hero__meta b { color: var(--fg); display: block; font-size: 14px; }
+
+  .apex-team-concept {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 60px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+  }
+  @media (max-width: 720px) { .apex-team-concept { grid-template-columns: 1fr; gap: 28px; padding: 40px 20px; } }
+  .apex-team-concept h2 {
+    font-family: var(--font-head);
+    font-size: 56px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-bottom: 22px;
+  }
+  .apex-team-concept p {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--fg-dim);
+    margin-bottom: 18px;
+    max-width: 60ch;
+  }
+  .apex-team-tagline {
+    margin: 60px auto;
+    max-width: 1100px;
+    padding: 60px 28px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .apex-team-tagline blockquote {
+    font-family: var(--font-head);
+    font-size: clamp(28px, 5vw, 52px);
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .apex-team-tagline blockquote b { color: var(--accent); font-weight: inherit; }
+
+  .apex-goals {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 28px 60px;
+  }
+  .apex-goals__title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 18px;
+  }
+  .apex-goals__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    list-style: none;
+    padding: 0; margin: 0;
+  }
+  .apex-goals__list li {
+    border: 1px solid var(--line);
+    padding: 18px 20px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--fg);
+    transition: border-color .15s var(--ease);
+  }
+  .apex-goals__list li:hover { border-color: var(--accent); }
+
+  .apex-cars {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 28px 80px;
+  }
+  .apex-cars__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  .apex-cars__head h2 {
+    font-family: var(--font-head);
+    font-size: 64px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .apex-cars__head .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    text-align: right;
+  }
+  .apex-car-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  @media (max-width: 800px) { .apex-car-grid { grid-template-columns: 1fr; } }
+  .apex-car {
+    background: oklch(0.16 0.012 250);
+    border: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    transition: border-color .2s var(--ease), transform .2s var(--ease);
+  }
+  .apex-car:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .apex-car__photo {
+    aspect-ratio: 4 / 3;
+    background: repeating-linear-gradient(115deg, oklch(0.22 0.015 250) 0 6px, oklch(0.19 0.015 250) 6px 12px);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .apex-car__photo[data-photo] { background-image: var(--photo-url); }
+  .apex-car__body { padding: 24px 28px 28px; }
+  .apex-car__num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .apex-car__name {
+    font-family: var(--font-head);
+    font-size: 36px;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    margin-bottom: 12px;
+  }
+  .apex-car__sub {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .apex-car__specs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
+  .apex-car__spec {
+    font-size: 12px;
+  }
+  .apex-car__spec dt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 2px;
+  }
+  .apex-car__spec dd {
+    margin: 0;
+    color: var(--fg);
+    line-height: 1.4;
+  }
+  .apex-car__notes {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--fg-dim);
+  }
+</style>
+</head><body class="apex-body">
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="../index.html">
+      <svg class="monster-head" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="var(--accent)" stroke="none"/>
+      </svg>
+      DRIFT<b>.EG.JE</b>
+    </a>
+    <nav class="nav">
+      <a href="home.html">Home</a>
+      <a class="active" href="team.html">Team</a>
+      <a href="drivers.html">Drivers</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="tracks.html">Tracks</a>
+      <a href="shop.html">Shop</a>
+    </nav>
+    <div class="topbar__right">
+      <a class="btn btn--primary" href="https://t.me/x7777708" target="_blank" rel="noopener">Join</a>
+    </div>
+  </div>
+</header>
+
+<section class="apex-team-hero">
+  <div class="apex-team-hero__kicker">Drift Team · Season 2026</div>
+  <h1 id="team-name">Dark <b>Force</b></h1>
+  <div class="apex-team-hero__slogans" id="team-slogans"></div>
+  <div class="apex-team-hero__meta" id="team-meta"></div>
+</section>
+
+<section class="apex-team-concept" id="team-concept">
+  <div>
+    <h2>Концепция</h2>
+    <p id="team-intro"></p>
+  </div>
+  <div>
+    <h2>Символ</h2>
+    <p id="team-symbol"></p>
+  </div>
+</section>
+
+<section class="apex-team-tagline">
+  <blockquote id="team-tagline"></blockquote>
+</section>
+
+<section class="apex-goals">
+  <div class="apex-goals__title">What we do</div>
+  <ul class="apex-goals__list" id="team-goals"></ul>
+</section>
+
+<section class="apex-cars">
+  <div class="apex-cars__head">
+    <h2>Garage</h2>
+    <div class="meta"><span id="cars-count">— cars</span><br><span>Team build sheet</span></div>
+  </div>
+  <div class="apex-car-grid" id="cars-grid"></div>
+</section>
+
+<footer class="apex-footer">
+  <div class="apex-footer__mono">
+    <span>© 2026 DRIFT.EG.JE</span>
+    <span>Apex variant · team</span>
+  </div>
+</footer>
+
+<script>
+window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
+  "accent": "orange",
+  "density": "comfy",
+  "motion": true,
+  "hero": "video",
+  "lang": "ru"
+}/*EDITMODE-END*/;
+</script>
+<script src="../drift-data.js"></script>
+<script src="../shared.js"></script>
+<script>
+(function () {
+  function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+  var data = window.DRIFT_DATA || {};
+  var team = data.team || {};
+
+  // Team meta block
+  if (team.fullName || team.name) document.getElementById('team-name').innerHTML = esc(team.fullName || team.name);
+  document.getElementById('team-slogans').innerHTML = (team.slogans || []).map(function (s) {
+    return '<span class="apex-team-hero__slogan">' + esc(s) + '</span>';
+  }).join('');
+  var metaParts = [];
+  if (team.founded) metaParts.push('<div><span>Основано</span><b>' + esc(team.founded) + '</b></div>');
+  if (team.based) metaParts.push('<div><span>База</span><b>' + esc(team.based) + '</b></div>');
+  metaParts.push('<div><span>Roster</span><b>' + ((data.drivers || []).length) + ' пилотов</b></div>');
+  metaParts.push('<div><span>Garage</span><b>' + ((data.cars || []).length) + ' машин</b></div>');
+  document.getElementById('team-meta').innerHTML = metaParts.join('');
+
+  document.getElementById('team-intro').textContent = team.intro || '';
+  document.getElementById('team-symbol').textContent = team.symbol || '';
+  document.getElementById('team-tagline').innerHTML = team.tagline ? esc(team.tagline) : '';
+
+  document.getElementById('team-goals').innerHTML = (team.goals || []).map(function (g) {
+    return '<li>' + esc(g) + '</li>';
+  }).join('');
+
+  // Cars grid
+  var cars = data.cars || [];
+  document.getElementById('cars-count').textContent = cars.length + (cars.length === 1 ? ' car' : ' cars');
+  document.getElementById('cars-grid').innerHTML = cars.map(function (c, i) {
+    var num = String(i + 1).padStart(2, '0');
+    var photoStyle = c.photo
+      ? 'background-image:url(\'' + esc(c.photo) + '\'); background-size:cover; background-position:center;'
+      : '';
+    var subParts = [c.color, c.driver].filter(Boolean).map(esc).join(' · ');
+    var specPairs = [
+      ['Engine', c.engine],
+      ['Power', c.hp ? c.hp + ' HP' : null],
+      ['Torque', c.torque],
+      ['Turbo', c.turbo],
+      ['ECU', c.ecu],
+      ['Cage', c.cage],
+      ['Angle kit', c.angleKit],
+      ['Coilovers', c.coilovers],
+      ['Fuel', c.fuel],
+      ['Livery', c.livery],
+    ].filter(function (p) { return p[1]; });
+    var specs = specPairs.map(function (p) {
+      return '<dl class="apex-car__spec"><dt>' + esc(p[0]) + '</dt><dd>' + esc(p[1]) + '</dd></dl>';
+    }).join('');
+    return '' +
+      '<article class="apex-car" data-slot="car-' + esc(c.id) + '">' +
+        '<div class="apex-car__photo' + (c.photo ? ' has-photo' : ' ph') + '" style="' + photoStyle + '" data-label="CAR"></div>' +
+        '<div class="apex-car__body">' +
+          '<div class="apex-car__num">Build ' + num + '</div>' +
+          '<div class="apex-car__name">' + esc(c.name) + '</div>' +
+          (subParts ? '<div class="apex-car__sub">' + subParts + '</div>' : '') +
+          (specPairs.length ? '<div class="apex-car__specs">' + specs + '</div>' : '') +
+          (c.notes ? '<div class="apex-car__notes">' + esc(c.notes) + '</div>' : '') +
+        '</div>' +
+      '</article>';
+  }).join('');
+})();
+</script>
+</body>
+</html>

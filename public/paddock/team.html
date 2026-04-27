@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ru" data-variant="paddock">
+<head>
+<meta charset="utf-8">
+<title>Team — Paddock — drift.eg.je</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared.css">
+<link rel="stylesheet" href="paddock.css">
+<style>
+  .pad-team-hero {
+    padding: 60px 28px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .pad-team-hero h1 {
+    font-family: var(--font-head);
+    font-size: clamp(56px, 11vw, 140px);
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    margin: 0 0 14px;
+    -webkit-text-stroke: 2px var(--accent);
+    color: transparent;
+  }
+  .pad-team-hero h1 b {
+    -webkit-text-stroke: 0;
+    color: var(--accent);
+    font-weight: inherit;
+  }
+  .pad-team-hero__tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .pad-team-hero__slogans {
+    display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px;
+  }
+  .pad-team-hero__slogans b {
+    background: var(--accent);
+    color: var(--surface);
+    font-family: var(--font-head);
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    transform: rotate(-1deg);
+    display: inline-block;
+  }
+  .pad-team-hero__slogans b:nth-child(2) { transform: rotate(1.5deg); background: var(--fg); color: var(--bg); }
+  .pad-team-hero__slogans b:nth-child(3) { transform: rotate(-0.5deg); }
+
+  .pad-team-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .pad-team-meta > div {
+    padding: 18px 24px;
+    border-right: 1px solid var(--line);
+  }
+  .pad-team-meta > div:last-child { border-right: 0; }
+  .pad-team-meta__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .pad-team-meta__value {
+    font-family: var(--font-head);
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .pad-section.pad-team {
+    padding-top: 40px;
+  }
+  .pad-team-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    padding: 0 28px;
+  }
+  @media (max-width: 720px) { .pad-team-cols { grid-template-columns: 1fr; padding: 0 20px; } }
+  .pad-team-cols h3 {
+    font-family: var(--font-head);
+    font-size: 32px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 8px;
+  }
+  .pad-team-cols p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg-dim);
+  }
+
+  .pad-team-tagline {
+    margin: 60px 28px;
+    padding: 40px 28px;
+    text-align: center;
+    border: 1px solid var(--accent);
+    background: repeating-linear-gradient(115deg, oklch(0.12 0.012 250) 0 6px, oklch(0.10 0.012 250) 6px 12px);
+  }
+  .pad-team-tagline blockquote {
+    font-family: var(--font-head);
+    font-size: clamp(24px, 4vw, 40px);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    margin: 0;
+    color: var(--fg);
+  }
+
+  .pad-goals {
+    padding: 0 28px 40px;
+  }
+  .pad-goals__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .pad-goals ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0;
+    list-style: none;
+    padding: 0; margin: 0;
+    border-top: 1px solid var(--line);
+  }
+  .pad-goals li {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    font-size: 14px;
+    color: var(--fg);
+    line-height: 1.4;
+  }
+
+  .pad-cars {
+    padding: 60px 28px;
+    border-top: 1px solid var(--line);
+  }
+  .pad-cars__head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 24px;
+  }
+  .pad-cars__head h2 {
+    font-family: var(--font-head);
+    font-size: 56px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .pad-cars__head .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .pad-car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 0;
+  }
+  .pad-car {
+    border: 1px solid var(--line);
+    margin-left: -1px; margin-top: -1px;
+    background: var(--surface);
+    transition: all .2s var(--ease);
+    display: flex; flex-direction: column;
+  }
+  .pad-car:hover {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--accent);
+    z-index: 2;
+  }
+  .pad-car__photo {
+    aspect-ratio: 4 / 3;
+    background: repeating-linear-gradient(115deg, oklch(0.22 0.015 250) 0 6px, oklch(0.19 0.015 250) 6px 12px);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 1px solid var(--line);
+  }
+  .pad-car__body { padding: 18px 22px; }
+  .pad-car__num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .pad-car__name {
+    font-family: var(--font-head);
+    font-size: 26px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    margin-bottom: 10px;
+  }
+  .pad-car__specs {
+    display: flex; flex-wrap: wrap; gap: 4px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .pad-car__specs b { color: var(--fg); font-weight: 600; }
+  .pad-car__notes {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--fg-dim);
+    border-top: 1px dashed var(--line);
+    padding-top: 12px;
+  }
+</style>
+</head><body class="pad-body">
+
+<div class="pad-strip"></div>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="../index.html">
+      <svg class="monster-head" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="var(--accent)" stroke="none"/>
+      </svg>
+      DRIFT<b>.EG.JE</b>
+    </a>
+    <nav class="nav">
+      <a href="home.html">Home</a>
+      <a class="active" href="team.html">Team</a>
+      <a href="drivers.html">Drivers</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="tracks.html">Tracks</a>
+      <a href="shop.html">Shop</a>
+    </nav>
+    <div class="topbar__right">
+      <a class="btn btn--primary" href="https://t.me/x7777708" target="_blank" rel="noopener">Join</a>
+    </div>
+  </div>
+</header>
+
+<section class="pad-team-hero">
+  <div class="pad-team-hero__tag">DRIFT TEAM · SEASON 2026</div>
+  <h1 id="team-name">Dark <b>Force</b></h1>
+  <div class="pad-team-hero__slogans" id="team-slogans"></div>
+</section>
+
+<div class="pad-team-meta" id="team-meta"></div>
+
+<section class="pad-section pad-team">
+  <div class="pad-team-cols">
+    <div>
+      <h3>Концепция</h3>
+      <p id="team-intro"></p>
+    </div>
+    <div>
+      <h3>Символ</h3>
+      <p id="team-symbol"></p>
+    </div>
+  </div>
+</section>
+
+<section class="pad-team-tagline">
+  <blockquote id="team-tagline"></blockquote>
+</section>
+
+<section class="pad-goals">
+  <div class="pad-goals__title">/ Чем мы занимаемся</div>
+  <ul id="team-goals"></ul>
+</section>
+
+<section class="pad-cars">
+  <div class="pad-cars__head">
+    <h2>Garage</h2>
+    <div class="meta"><span id="cars-count">— cars</span> · build sheet</div>
+  </div>
+  <div class="pad-car-grid" id="cars-grid"></div>
+</section>
+
+<footer class="pad-footer">
+  <div class="pad-footer__mono">
+    <span>© 2026 DRIFT.EG.JE</span>
+    <span>Paddock variant · team</span>
+  </div>
+</footer>
+
+<script>
+window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
+  "accent": "orange",
+  "density": "comfy",
+  "motion": true,
+  "hero": "video",
+  "lang": "ru"
+}/*EDITMODE-END*/;
+</script>
+<script src="../drift-data.js"></script>
+<script src="../shared.js"></script>
+<script>
+(function () {
+  function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+  var data = window.DRIFT_DATA || {};
+  var team = data.team || {};
+
+  if (team.fullName || team.name) document.getElementById('team-name').innerHTML = esc(team.fullName || team.name);
+  document.getElementById('team-slogans').innerHTML = (team.slogans || []).map(function (s) {
+    return '<b>' + esc(s) + '</b>';
+  }).join('');
+
+  var metaCells = [
+    ['Founded', team.founded || ''],
+    ['Based', team.based || ''],
+    ['Roster', ((data.drivers || []).length) + ' drivers'],
+    ['Garage', ((data.cars || []).length) + ' cars'],
+  ];
+  document.getElementById('team-meta').innerHTML = metaCells.filter(function (c) { return c[1]; }).map(function (c) {
+    return '<div><div class="pad-team-meta__label">' + esc(c[0]) + '</div><div class="pad-team-meta__value">' + esc(c[1]) + '</div></div>';
+  }).join('');
+
+  document.getElementById('team-intro').textContent = team.intro || '';
+  document.getElementById('team-symbol').textContent = team.symbol || '';
+  document.getElementById('team-tagline').innerHTML = team.tagline ? esc(team.tagline) : '';
+
+  document.getElementById('team-goals').innerHTML = (team.goals || []).map(function (g) {
+    return '<li>' + esc(g) + '</li>';
+  }).join('');
+
+  var cars = data.cars || [];
+  document.getElementById('cars-count').textContent = cars.length + (cars.length === 1 ? ' car' : ' cars');
+  document.getElementById('cars-grid').innerHTML = cars.map(function (c, i) {
+    var num = String(i + 1).padStart(2, '0');
+    var photoStyle = c.photo
+      ? 'background-image:url(\'' + esc(c.photo) + '\'); background-size:cover; background-position:center;'
+      : '';
+    var specPairs = [
+      ['ENG', c.engine],
+      ['HP', c.hp ? c.hp : null],
+      ['TURBO', c.turbo],
+      ['CAGE', c.cage],
+      ['ANGLE', c.angleKit],
+      ['SUS', c.coilovers],
+      ['FUEL', c.fuel],
+      ['LIVERY', c.livery],
+    ].filter(function (p) { return p[1]; });
+    var specsHtml = specPairs.map(function (p) {
+      return '<span>' + esc(p[0]) + '<b>' + esc(p[1]) + '</b></span>';
+    }).join('');
+    return '' +
+      '<article class="pad-car" data-slot="car-' + esc(c.id) + '">' +
+        '<div class="pad-car__photo' + (c.photo ? ' has-photo' : ' ph') + '" style="' + photoStyle + '" data-label="CAR"></div>' +
+        '<div class="pad-car__body">' +
+          '<div class="pad-car__num">Build ' + num + (c.color ? ' · ' + esc(c.color) : '') + '</div>' +
+          '<div class="pad-car__name">' + esc(c.name) + '</div>' +
+          (specPairs.length ? '<div class="pad-car__specs">' + specsHtml + '</div>' : '') +
+          (c.notes ? '<div class="pad-car__notes">' + esc(c.notes) + '</div>' : '') +
+        '</div>' +
+      '</article>';
+  }).join('');
+})();
+</script>
+</body>
+</html>
