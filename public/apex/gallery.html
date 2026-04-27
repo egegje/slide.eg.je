@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ru" data-variant="apex">
+<head>
+<meta charset="utf-8">
+<title>Gallery — Apex — drift.eg.je</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared.css">
+<link rel="stylesheet" href="apex.css">
+<style>
+  .apex-gallery {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 60px 28px 80px;
+  }
+  .apex-gallery__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  .apex-gallery__head h1 {
+    font-family: var(--font-head);
+    font-size: clamp(48px, 9vw, 120px);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .apex-gallery__head .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    text-align: right;
+  }
+  .apex-gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 4px;
+  }
+  .apex-gallery__cell {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: oklch(0.16 0.012 250);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .apex-gallery__cell img,
+  .apex-gallery__cell video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s var(--ease);
+  }
+  .apex-gallery__cell:hover img,
+  .apex-gallery__cell:hover video { transform: scale(1.04); }
+  .apex-gallery__cell .badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    z-index: 2;
+  }
+  .apex-gallery__empty {
+    border: 1px dashed var(--line);
+    padding: 60px 24px;
+    text-align: center;
+    color: var(--fg-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Lightbox */
+  .lb-back {
+    position: fixed; inset: 0;
+    background: oklch(0.05 0.005 250 / 0.92);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .lb-back.on { display: flex; }
+  .lb-back img, .lb-back video {
+    max-width: 95vw;
+    max-height: 92vh;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+  }
+  .lb-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    width: 44px; height: 44px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--fg);
+    font-size: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .lb-close:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head><body class="apex-body">
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="../index.html">
+      <svg class="monster-head" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="var(--accent)" stroke="none"/>
+      </svg>
+      DRIFT<b>.EG.JE</b>
+    </a>
+    <nav class="nav">
+      <a href="home.html">Home</a>
+      <a href="team.html">Team</a>
+      <a href="drivers.html">Drivers</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="tracks.html">Tracks</a>
+      <a class="active" href="gallery.html">Gallery</a>
+      <a href="shop.html">Shop</a>
+    </nav>
+    <div class="topbar__right">
+      <a class="btn btn--primary" href="https://t.me/x7777708" target="_blank" rel="noopener">Join</a>
+    </div>
+  </div>
+</header>
+
+<section class="apex-gallery">
+  <div class="apex-gallery__head">
+    <h1>Gallery</h1>
+    <div class="meta">
+      <span id="gal-count">— files</span><br>
+      <span>Photos & video</span>
+    </div>
+  </div>
+  <div id="gal-host"></div>
+</section>
+
+<div class="lb-back" id="lb">
+  <button class="lb-close" onclick="closeLb()">×</button>
+  <div id="lb-content"></div>
+</div>
+
+<footer class="apex-footer">
+  <div class="apex-footer__mono">
+    <span>© 2026 DRIFT.EG.JE</span>
+    <span>Apex variant · gallery</span>
+  </div>
+</footer>
+
+<script>
+window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
+  "accent": "orange",
+  "density": "comfy",
+  "motion": true,
+  "hero": "video",
+  "lang": "ru"
+}/*EDITMODE-END*/;
+</script>
+<script src="../shared.js"></script>
+<script src="../gallery-data.js"></script>
+<script>
+(function () {
+  function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+  var list = window.GALLERY_DATA || [];
+  var host = document.getElementById('gal-host');
+  document.getElementById('gal-count').textContent = list.length + (list.length === 1 ? ' file' : ' files');
+  if (!list.length) {
+    host.innerHTML = '<div class="apex-gallery__empty">Скоро здесь появится съёмка с тренировок и ивентов.</div>';
+    return;
+  }
+  host.innerHTML = '<div class="apex-gallery__grid">' + list.map(function (g) {
+    var media = g.kind === 'video'
+      ? '<video src="' + esc(g.url) + '" muted preload="metadata" data-id="' + esc(g.id) + '"></video>'
+      : '<img src="' + esc(g.url) + '" alt="" loading="lazy" data-id="' + esc(g.id) + '">';
+    return '<div class="apex-gallery__cell" data-id="' + esc(g.id) + '">' +
+      (g.kind === 'video' ? '<span class="badge">VIDEO</span>' : '') +
+      media +
+      '</div>';
+  }).join('') + '</div>';
+  // Lightbox bindings
+  host.addEventListener('click', function (e) {
+    var cell = e.target.closest('.apex-gallery__cell');
+    if (!cell) return;
+    var id = cell.getAttribute('data-id');
+    var item = list.find(function (g) { return g.id === id; });
+    if (!item) return;
+    var lb = document.getElementById('lb');
+    var content = document.getElementById('lb-content');
+    content.innerHTML = item.kind === 'video'
+      ? '<video src="' + esc(item.url) + '" controls autoplay></video>'
+      : '<img src="' + esc(item.url) + '" alt="">';
+    lb.classList.add('on');
+  });
+  document.getElementById('lb').addEventListener('click', function (e) {
+    if (e.target.id === 'lb') closeLb();
+  });
+})();
+function closeLb() {
+  document.getElementById('lb').classList.remove('on');
+  document.getElementById('lb-content').innerHTML = '';
+}
+</script>
+</body>
+</html>

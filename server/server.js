@@ -77,6 +77,16 @@ async function syncDriftDataJs(publishedData) {
   await writeFile(DRIFT_DATA_JS, banner + body, "utf8");
 }
 
+// Gallery is unstaged — uploads land on the live site immediately. The
+// public site reads window.GALLERY_DATA from /gallery-data.js. Regenerate
+// this file whenever the gallery list mutates.
+const GALLERY_DATA_JS = join(PUB, "gallery-data.js");
+async function syncGalleryDataJs(list) {
+  const banner = "// Auto-generated. Edits here are overwritten on every upload/remove.\n";
+  const body = "window.GALLERY_DATA = " + JSON.stringify(list || []) + ";\n";
+  await writeFile(GALLERY_DATA_JS, banner + body, "utf8");
+}
+
 // Bootstrap: if drift-data.draft.json doesn't exist, seed it from the
 // published drift-data.json so the admin has something to edit on first run.
 async function ensureDraftExists() {
@@ -206,6 +216,13 @@ app.post("/admin/login", async (req, reply) => {
     return reply.redirect("/admin/login?err=maintenance");
   }
   req.session.set("user", u.login);
+  // Drop the preview-bypass cookie at path "/" alongside the admin
+  // session so the iframe (and any /gallery/, /photos/ asset request)
+  // skips the maintenance gate without a separate /preview-unlock visit.
+  reply.header(
+    "set-cookie",
+    `df_preview=${PREVIEW_TOKEN}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax`,
+  );
   return reply.redirect("/admin");
 });
 
@@ -1638,6 +1655,7 @@ app.post("/admin/api/upload-gallery", { preHandler: requireAuth }, async (req, r
   };
   list.unshift(item);
   await writeJson(GALLERY_FILE, list);
+  await syncGalleryDataJs(list);
   await logUpload(req.adminUser, "gallery-" + item.kind, "—", fname, buf.length);
   return item;
 });
@@ -1652,6 +1670,7 @@ app.post("/admin/api/remove-gallery", { preHandler: requireAuth }, async (req, r
   await unlink(join(GALLERY_DIR, item.storedAs)).catch(() => {});
   list.splice(idx, 1);
   await writeJson(GALLERY_FILE, list);
+  await syncGalleryDataJs(list);
   return { ok: true };
 });
 
@@ -1736,6 +1755,11 @@ app.get("/admin/health", async () => ({ ok: true }));
 
 const start = async () => {
   await ensureDraftExists();
+  // Bootstrap gallery-data.js if missing
+  if (!existsSync(GALLERY_DATA_JS)) {
+    const list = await readJson(GALLERY_FILE, []);
+    await syncGalleryDataJs(list);
+  }
   await app.listen({ port: PORT, host: "127.0.0.1" });
   console.log(`Dark Force admin listening on 127.0.0.1:${PORT}`);
 };

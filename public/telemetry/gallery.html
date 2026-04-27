@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ru" data-variant="telemetry">
+<head>
+<meta charset="utf-8">
+<title>Gallery — Telemetry — drift.eg.je</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared.css">
+<link rel="stylesheet" href="telemetry.css">
+<style>
+  .tele-gallery {
+    padding: 40px 24px 60px;
+  }
+  .tele-gallery__head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 22px;
+  }
+  .tele-gallery__head h1 {
+    font-family: var(--font-head);
+    font-size: clamp(40px, 7vw, 88px);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .tele-gallery__head .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    text-align: right;
+  }
+  .tele-gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .tele-gallery__cell {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: var(--surface);
+    overflow: hidden;
+    cursor: pointer;
+    transition: opacity .15s var(--ease);
+  }
+  .tele-gallery__cell:hover { opacity: 0.92; }
+  .tele-gallery__cell img,
+  .tele-gallery__cell video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .tele-gallery__cell .badge {
+    position: absolute;
+    bottom: 6px; left: 6px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    z-index: 2;
+  }
+  .tele-gallery__empty {
+    border: 1px dashed var(--line);
+    padding: 50px 20px;
+    text-align: center;
+    color: var(--fg-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .lb-back { position: fixed; inset: 0; background: oklch(0.05 0.005 250 / 0.94); z-index: 100; display: none; align-items: center; justify-content: center; padding: 24px; }
+  .lb-back.on { display: flex; }
+  .lb-back img, .lb-back video { max-width: 95vw; max-height: 92vh; }
+  .lb-close { position: absolute; top: 18px; right: 18px; width: 40px; height: 40px; background: var(--bg); border: 1px solid var(--accent); color: var(--accent); cursor: pointer; }
+</style>
+</head><body class="tele-body">
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" href="../index.html">
+      <svg class="monster-head" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="var(--accent)" stroke="none"/>
+      </svg>
+      DRIFT<b>.EG.JE</b>
+    </a>
+    <nav class="nav">
+      <a href="home.html">Home</a>
+      <a href="team.html">Team</a>
+      <a href="drivers.html">Drivers</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="tracks.html">Tracks</a>
+      <a class="active" href="gallery.html">Gallery</a>
+      <a href="shop.html">Shop</a>
+    </nav>
+    <div class="topbar__right">
+      <a class="btn btn--primary" href="https://t.me/x7777708" target="_blank" rel="noopener">Join</a>
+    </div>
+  </div>
+</header>
+
+<section class="tele-gallery">
+  <div class="tele-gallery__head">
+    <h1>Gallery</h1>
+    <div class="meta"><span id="gal-count">— files</span><br><span>Photos & video</span></div>
+  </div>
+  <div id="gal-host"></div>
+</section>
+
+<div class="lb-back" id="lb">
+  <button class="lb-close" onclick="closeLb()">×</button>
+  <div id="lb-content"></div>
+</div>
+
+<footer class="tele-footer">
+  <div class="tele-footer__mono">
+    <span>© 2026 DRIFT.EG.JE</span>
+    <span>Telemetry variant · gallery</span>
+  </div>
+</footer>
+
+<script>
+window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
+  "accent": "orange",
+  "density": "comfy",
+  "motion": true,
+  "hero": "video",
+  "lang": "ru"
+}/*EDITMODE-END*/;
+</script>
+<script src="../shared.js"></script>
+<script src="../gallery-data.js"></script>
+<script>
+(function () {
+  function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+  var list = window.GALLERY_DATA || [];
+  var host = document.getElementById('gal-host');
+  document.getElementById('gal-count').textContent = list.length + (list.length === 1 ? ' file' : ' files');
+  if (!list.length) {
+    host.innerHTML = '<div class="tele-gallery__empty">Скоро здесь появится съёмка с тренировок и ивентов.</div>';
+    return;
+  }
+  host.innerHTML = '<div class="tele-gallery__grid">' + list.map(function (g) {
+    var media = g.kind === 'video'
+      ? '<video src="' + esc(g.url) + '" muted preload="metadata"></video>'
+      : '<img src="' + esc(g.url) + '" alt="" loading="lazy">';
+    return '<div class="tele-gallery__cell" data-id="' + esc(g.id) + '">' +
+      (g.kind === 'video' ? '<span class="badge">VIDEO</span>' : '') +
+      media +
+      '</div>';
+  }).join('') + '</div>';
+  host.addEventListener('click', function (e) {
+    var cell = e.target.closest('.tele-gallery__cell'); if (!cell) return;
+    var item = list.find(function (g) { return g.id === cell.getAttribute('data-id'); });
+    if (!item) return;
+    var content = document.getElementById('lb-content');
+    content.innerHTML = item.kind === 'video'
+      ? '<video src="' + esc(item.url) + '" controls autoplay></video>'
+      : '<img src="' + esc(item.url) + '" alt="">';
+    document.getElementById('lb').classList.add('on');
+  });
+  document.getElementById('lb').addEventListener('click', function (e) {
+    if (e.target.id === 'lb') closeLb();
+  });
+})();
+function closeLb() {
+  document.getElementById('lb').classList.remove('on');
+  document.getElementById('lb-content').innerHTML = '';
+}
+</script>
+</body>
+</html>
