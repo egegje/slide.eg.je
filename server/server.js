@@ -8,7 +8,7 @@ import { existsSync } from "node:fs";
 import { join, extname } from "node:path";
 import { randomBytes } from "node:crypto";
 
-const ROOT = "/opt/slide.eg.je";
+const ROOT = process.env.ROOT_DIR || "/opt/slide.eg.je";
 const DATA_DIR = join(ROOT, "data");
 const PUB = join(ROOT, "public");
 // PUBLISHED data — what the live site reads via drift-data.js.
