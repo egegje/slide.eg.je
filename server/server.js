@@ -627,6 +627,7 @@ const DASH_HTML = `<!doctype html>
     if (kind === 'car') entity = state.cars.find((x) => String(x.id) === String(id));
     if (!entity) { state.editEntity = null; return ''; }
     const fields = (kind === 'driver') ? [
+      ['rank', '# номер', entity.rank, false, 'number'],
       ['name', 'Имя', entity.name, false],
       ['country', 'Страна', entity.country, false],
       ['flag', 'Флаг', entity.flag || '', false],
@@ -1509,6 +1510,17 @@ app.patch("/admin/api/drivers/:rank", { preHandler: requireAuth }, async (req, r
   if (b.engine !== undefined) dr.engine = String(b.engine).slice(0, 80);
   if (b.hp !== undefined) dr.hp = Number(b.hp) || 0;
   if (b.instagram !== undefined) dr.instagram = b.instagram ? String(b.instagram).slice(0, 80) : null;
+  if (b.rank !== undefined) {
+    const nextRank = parseInt(b.rank, 10);
+    if (!Number.isFinite(nextRank) || nextRank < 1 || nextRank > 999) {
+      return reply.code(400).send({ error: "rank must be 1..999" });
+    }
+    if (nextRank !== rank) {
+      const conflict = (data.drivers || []).find((x) => x.rank === nextRank);
+      if (conflict) conflict.rank = rank; // swap places
+      dr.rank = nextRank;
+    }
+  }
   await writeJson(DRIFT_DATA, data);
   // (draft only — public sync deferred to /admin/api/publish)
   return dr;
