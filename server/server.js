@@ -519,13 +519,6 @@ const DASH_HTML = `<!doctype html>
         '<div class="group__hint">' + escHtml(SPECS.hero.label + ' · от ' + SPECS.hero.min + ' · до ' + SPECS.hero.max) + '</div>' +
         heroSlot +
       '</div>' +
-      '<div class="group" data-reorder="driver">' +
-        '<div class="group__title"><b>Пилоты</b><span>' + state.drivers.length + '</span>' +
-          '<button class="group__add" onclick="toggleNewForm(\\'driver\\')">+ Добавить</button>' +
-        '</div>' +
-        '<div class="group__hint">' + escHtml(SPECS.driver.label + ' · от ' + SPECS.driver.min + ' · перетащи строку чтобы поменять порядок') + '</div>' +
-        driverNew + driverSlots +
-      '</div>' +
       '<div class="group" data-reorder="track">' +
         '<div class="group__title"><b>Трассы</b><span>' + state.tracks.length + '</span>' +
           '<button class="group__add" onclick="toggleNewForm(\\'track\\')">+ Добавить</button>' +
