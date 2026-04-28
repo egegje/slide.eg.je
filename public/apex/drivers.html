@@ -1,16 +1,16 @@
 <!doctype html>
-<html lang="en" data-variant="telemetry">
+<html lang="en" data-variant="apex">
 <head>
 <meta charset="utf-8">
-<title>Shop — Telemetry — drift.eg.je</title>
+<title>Drivers — Apex — drift.eg.je</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared.css">
-<link rel="stylesheet" href="telemetry.css">
+<link rel="stylesheet" href="apex.css">
 </head>
-<body class="tele-body">
+<body class="apex-body">
 
 <header class="topbar">
   <div class="topbar__inner">
@@ -23,11 +23,11 @@
     <nav class="nav">
       <a href="home.html">Home</a>
       <a href="team.html">Team</a>
-      <a href="drivers.html">Drivers</a>
+      <a class="active" href="drivers.html">Drivers</a>
       <a href="calendar.html">Calendar</a>
       <a href="tracks.html">Tracks</a>
       <a href="gallery.html">Gallery</a>
-      <a class="active" href="shop.html">Shop</a>
+      <a href="shop.html">Shop</a>
     </nav>
     <div class="topbar__right">
       <a class="btn btn--primary" href="#">Join</a>
@@ -35,26 +35,25 @@
   </div>
 </header>
 
-<section class="tele-section">
-  <div class="tele-section__head">
+<section class="apex-section">
+  <div class="apex-section__head">
     <div>
-      <div class="kicker">OFFERING</div>
-      <h2>Services</h2>
+      <div class="no">Roster</div>
+      <h2>Drivers</h2>
     </div>
-    <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;color:var(--fg-dim);text-transform:uppercase;text-align:right">
-      4 DIRECTIONS<br>
-      DARK FORCE
+    <div class="meta">
+      24 <span>in roster</span><br>
+      <span>world top + RU</span>
     </div>
   </div>
 
-
-  <div class="tele-services" id="services-grid"></div>
+  <div class="apex-drivers" id="drivers-grid"></div>
 </section>
 
-<footer class="tele-footer">
-  <div class="tele-footer__mono">
+<footer class="apex-footer">
+  <div class="apex-footer__mono">
     <span>© 2026 DRIFT.EG.JE</span>
-    <span>Telemetry variant · shop</span>
+    <span>Apex variant · drivers</span>
   </div>
 </footer>
 
@@ -73,20 +72,23 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
 (function () {
   function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
   var data = window.DRIFT_DATA || {};
-  var list = data.services || [];
-  var host = document.getElementById('services-grid');
+  var list = data.drivers || [];
+  var host = document.getElementById('drivers-grid');
   if (!host) return;
-  host.innerHTML = list.map(function (s) {
-    var cta = s.contact ? '<a class="btn btn--primary" href="' + esc(s.contact) + '" target="_blank" rel="noopener">' + esc(s.cta || 'Request') + ' →</a>' : '';
+  host.innerHTML = list.map(function (d) {
+    var num = String(d.rank).padStart(2, '0');
+    var parts = d.name.split(' ');
+    var last = parts.pop() || d.name;
+    var first = parts.join(' ');
     return '' +
-      '<div class="tele-service">' +
-        '<div class="tele-service__head">' +
-          '<div class="tele-service__name">' + esc(s.name) + '</div>' +
-          '<span class="tele-service__price">' + esc(s.price) + '</span>' +
+      '<div class="apex-driver">' +
+        '<div class="ph' + (d.photo ? ' has-photo' : '') + '" style="position:absolute;inset:0' + (d.photo ? ';background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center' : '') + '" data-label="' + esc(d.country) + '"></div>' +
+        '<div class="apex-driver__num">' + esc(num) + '</div>' +
+        '<div class="apex-driver__info">' +
+          '<div class="name">' + esc(first) + (first ? '<br>' : '') + esc(last) + '</div>' +
+          '<div class="car">' + esc(d.car) + '</div>' +
+          '<div class="car" style="color:var(--fg-dim);margin-top:2px">' + esc(d.engine) + ' · ' + esc(d.hp) + ' HP</div>' +
         '</div>' +
-        '<div class="tele-service__short">' + esc(s.short) + '</div>' +
-        '<div class="tele-service__long">' + esc(s.long) + '</div>' +
-        '<div class="tele-service__foot">' + cta + '</div>' +
       '</div>';
   }).join('');
 })();

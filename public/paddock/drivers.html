@@ -2,7 +2,7 @@
 <html lang="en" data-variant="paddock">
 <head>
 <meta charset="utf-8">
-<title>Tracks — Paddock — drift.eg.je</title>
+<title>Drivers — Paddock — drift.eg.je</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,9 +25,9 @@
     <nav class="nav">
       <a href="home.html">Home</a>
       <a href="team.html">Team</a>
-      <a href="drivers.html">Drivers</a>
+      <a class="active" href="drivers.html">Drivers</a>
       <a href="calendar.html">Calendar</a>
-      <a class="active" href="tracks.html">Tracks</a>
+      <a href="tracks.html">Tracks</a>
       <a href="gallery.html">Gallery</a>
       <a href="shop.html">Shop</a>
     </nav>
@@ -39,18 +39,18 @@
 
 <section class="pad-section">
   <div class="pad-section__head">
-    <span class="num">03</span>
-    <h2>Tracks</h2>
-    <span class="meta">5 IN DATABASE<br>FLORIDA</span>
+    <span class="num">01</span>
+    <h2>Pilots</h2>
+    <span class="meta">24 IN ROSTER<br>WORLD + RU</span>
   </div>
 
-  <div class="pad-tracks" id="tracks-grid"></div>
+  <div class="pad-crew" id="crew-grid"></div>
 </section>
 
 <footer class="pad-footer">
   <div class="pad-footer__mono">
     <span>© 2026 DRIFT.EG.JE</span>
-    <span>Paddock variant · tracks</span>
+    <span>Paddock variant · drivers</span>
   </div>
 </footer>
 
@@ -68,31 +68,31 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
 <script>
 (function () {
   function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
-  var levelLabel = { 'pro': 'PRO', 'pro-am': 'PRO-AM', 'amateur': 'AMATEUR', 'mixed': 'MIXED' };
   var data = window.DRIFT_DATA || {};
-  var list = data.tracks || [];
-  var host = document.getElementById('tracks-grid');
+  var list = data.drivers || [];
+  var host = document.getElementById('crew-grid');
   if (!host) return;
-  host.innerHTML = list.map(function (t) {
-    var lvl = levelLabel[t.level] || t.level || '';
-    var desc = t.description || '';
-    if (desc.length > 140) desc = desc.slice(0, 137).trim() + '…';
-    var footParts = [];
-    if (t.mapsUrl) footParts.push('<a href="' + esc(t.mapsUrl) + '" target="_blank" rel="noopener">MAP →</a>');
-    if (t.website) footParts.push('<a href="' + esc(t.website) + '" target="_blank" rel="noopener">SITE →</a>');
-    if (!footParts.length) footParts.push('<span>—</span>');
+  host.innerHTML = list.map(function (d) {
+    var num = String(d.rank).padStart(2, '0');
+    var tape = (d.tags || []).indexOf('champion') >= 0 ? 'CHAMPION' : 'PRO';
+    var titles = (d.titles || []).slice(0, 2).map(esc).join(' · ');
     return '' +
-      '<div class="pad-track" data-slot="track-' + esc(t.slug) + '">' +
-        (t.photo
-          ? '<div class="pad-track__photo has-photo" style="background-image:url(\'' + esc(t.photo) + '\')"></div>'
-          : '<div class="pad-track__photo ph" data-label="TRACK"></div>') +
-        '<div class="pad-track__head">' +
-          '<div class="pad-track__name">' + esc(t.name) + '</div>' +
-          (lvl ? '<span class="pad-track__lvl">' + esc(lvl) + '</span>' : '') +
+      '<div class="pad-crew__card" data-slot="driver-' + esc(d.rank) + '">' +
+        '<div class="pad-crew__img">' +
+          '<div class="ph' + (d.photo ? ' has-photo' : '') + '"' + (d.photo ? ' style="background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center"' : '') + ' data-label="' + esc(d.country) + '"></div>' +
+          '<span class="pad-crew__tape">' + esc(tape) + '</span>' +
+          '<span class="pad-crew__num">' + esc(num) + '</span>' +
         '</div>' +
-        '<div class="pad-track__loc">' + esc(t.city) + ' · ' + esc(t.region) + ' · ' + esc(t.country) + '</div>' +
-        '<div class="pad-track__desc">' + esc(desc) + '</div>' +
-        '<div class="pad-track__foot"><span>' + esc((t.series || []).join(' / ').toUpperCase() || '—') + '</span><span>' + footParts.join(' · ') + '</span></div>' +
+        '<div class="pad-crew__body">' +
+          '<div class="pad-crew__country">' + esc(d.flag || '') + ' ' + esc(d.country) + '</div>' +
+          '<div class="pad-crew__name">' + esc(d.name) + '</div>' +
+          '<div class="pad-crew__car">' + esc(d.car) + ' · ' + esc(d.engine) + '</div>' +
+          '<div class="pad-crew__specs">' +
+            '<div><b>' + esc(d.hp) + 'HP</b>POWER</div>' +
+            '<div><b>#' + esc(num) + '</b>RANK</div>' +
+          '</div>' +
+          (titles ? '<div class="pad-crew__titles">' + titles + '</div>' : '') +
+        '</div>' +
       '</div>';
   }).join('');
 })();

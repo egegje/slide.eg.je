@@ -2,7 +2,7 @@
 <html lang="en" data-variant="telemetry">
 <head>
 <meta charset="utf-8">
-<title>Tracks — Telemetry — drift.eg.je</title>
+<title>Drivers — Telemetry — drift.eg.je</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,9 +23,9 @@
     <nav class="nav">
       <a href="home.html">Home</a>
       <a href="team.html">Team</a>
-      <a href="drivers.html">Drivers</a>
+      <a class="active" href="drivers.html">Drivers</a>
       <a href="calendar.html">Calendar</a>
-      <a class="active" href="tracks.html">Tracks</a>
+      <a href="tracks.html">Tracks</a>
       <a href="gallery.html">Gallery</a>
       <a href="shop.html">Shop</a>
     </nav>
@@ -38,22 +38,22 @@
 <section class="tele-section">
   <div class="tele-section__head">
     <div>
-      <div class="kicker">LOCATIONS</div>
-      <h2>Tracks</h2>
+      <div class="kicker">ROSTER 2026</div>
+      <h2>All drivers</h2>
     </div>
     <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;color:var(--fg-dim);text-transform:uppercase;text-align:right">
-      5 IN DATABASE<br>
-      FLORIDA
+      24 IN ROSTER<br>
+      WORLD + RU
     </div>
   </div>
 
-  <div class="tele-tracks" id="tracks-grid"></div>
+  <div class="tele-drivers" id="drivers-grid"></div>
 </section>
 
 <footer class="tele-footer">
   <div class="tele-footer__mono">
     <span>© 2026 DRIFT.EG.JE</span>
-    <span>Telemetry variant · tracks</span>
+    <span>Telemetry variant · drivers</span>
   </div>
 </footer>
 
@@ -71,34 +71,31 @@ window.DRIFT_TWEAKS = /*EDITMODE-BEGIN*/{
 <script>
 (function () {
   function esc(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
-  var levelLabel = { 'pro': 'PRO', 'pro-am': 'PRO-AM', 'amateur': 'AMATEUR', 'mixed': 'MIXED' };
   var data = window.DRIFT_DATA || {};
-  var list = data.tracks || [];
-  var host = document.getElementById('tracks-grid');
+  var list = data.drivers || [];
+  var host = document.getElementById('drivers-grid');
   if (!host) return;
-  host.innerHTML = list.map(function (t) {
-    var lvl = levelLabel[t.level] || t.level || '';
-    var desc = t.description || '';
-    if (desc.length > 140) desc = desc.slice(0, 137).trim() + '…';
-    var series = (t.series || []).join(' · ').toUpperCase() || '—';
-    var links = [];
-    if (t.mapsUrl) links.push('<a href="' + esc(t.mapsUrl) + '" target="_blank" rel="noopener">MAPS →</a>');
-    if (t.website) links.push('<a href="' + esc(t.website) + '" target="_blank" rel="noopener">SITE →</a>');
+  host.innerHTML = list.map(function (d) {
+    var num = String(d.rank).padStart(2, '0');
+    var titles = (d.titles || []).slice(0, 2).map(esc).join(' · ');
     return '' +
-      '<div class="tele-track" data-slot="track-' + esc(t.slug) + '">' +
-        (t.photo
-          ? '<div class="tele-track__photo has-photo" style="background-image:url(\'' + esc(t.photo) + '\')"></div>'
-          : '<div class="tele-track__photo ph" data-label="TRACK"></div>') +
-        '<div class="tele-track__head">' +
-          '<div class="tele-track__name">' + esc(t.name) + '</div>' +
-          (lvl ? '<span class="tele-track__lvl">' + esc(lvl) + '</span>' : '') +
+      '<div class="tele-driver tele-driver--full" data-slot="driver-' + esc(d.rank) + '">' +
+        '<div class="tele-driver__img">' +
+          '<div class="ph' + (d.photo ? ' has-photo' : '') + '"' + (d.photo ? ' style="background-image:url(\'' + esc(d.photo) + '\');background-size:cover;background-position:center"' : '') + ' data-label="' + esc(num) + '"></div>' +
+          '<div class="num">' + esc(num) + '</div>' +
+          '<div class="tele-driver__flag">' + esc(d.flag || '') + '</div>' +
         '</div>' +
-        '<div class="tele-track__rows">' +
-          '<div>LOCATION<b>' + esc(t.city) + ', ' + esc(t.region) + '</b></div>' +
-          '<div>SERIES<b>' + esc(series) + '</b></div>' +
+        '<div class="tele-driver__body">' +
+          '<div class="tele-driver__name">' + esc(d.name) + '</div>' +
+          '<div class="tele-driver__country">' + esc(d.country) + '</div>' +
+          '<div class="tele-driver__car">' + esc(d.car) + '</div>' +
+          '<div class="tele-driver__stats">' +
+            '<div><b>' + esc(d.hp) + '</b>HP</div>' +
+            '<div><b>' + esc((d.engine || '').split(' ')[0]) + '</b>ENG</div>' +
+            '<div><b>' + esc((d.tires || '').split(' ')[0] || '—') + '</b>TIRE</div>' +
+          '</div>' +
+          (titles ? '<div class="tele-driver__titles">' + titles + '</div>' : '') +
         '</div>' +
-        '<div class="tele-track__desc">' + esc(desc) + '</div>' +
-        '<div class="tele-track__links">' + links.join('') + '</div>' +
       '</div>';
   }).join('');
 })();
