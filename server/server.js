@@ -1326,6 +1326,12 @@ app.get("/admin", { preHandler: requireAuth }, async (req, reply) => {
 
 // --- API ---
 
+// Public auth-status for the live site to enable inline edit mode.
+app.get("/admin/api/whoami", async (req) => {
+  const user = req.session.get("user");
+  return { authed: Boolean(user), user: user || null };
+});
+
 app.get("/admin/api/all", { preHandler: requireAuth }, async () => {
   const data = await readJson(DRIFT_DATA, {});
   const gallery = await readJson(GALLERY_FILE, []);

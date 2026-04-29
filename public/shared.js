@@ -192,3 +192,76 @@
       try { window.parent.postMessage({ type: 'darkforce:slot-click', slot: slot }, '*'); } catch (err) {}
     }, true);
   }());
+
+  // === Inline edit mode (when admin is logged in, OUTSIDE the admin iframe) ===
+  (async function () {
+    var inIframe = window.parent && window.parent !== window;
+    if (inIframe) return;  // admin iframe already has the overlay
+    if ((location.search || '').indexOf('draft=1') !== -1) return; // explicit draft preview only
+    try {
+      var r = await fetch('/admin/api/whoami', { credentials: 'same-origin' });
+      if (!r.ok) return;
+      var who = await r.json();
+      if (!who.authed) return;
+    } catch (e) { return; }
+
+    var st = document.createElement('style');
+    st.textContent =
+      'body{padding-top:44px!important}' +
+      '.df-edit-bar{position:fixed;top:0;left:0;right:0;height:44px;background:linear-gradient(90deg,#ff6b35,#c43d11);color:#fff;z-index:9999;display:flex;align-items:center;padding:0 16px;gap:14px;font:600 13px/1 Inter,Arial,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.3)}' +
+      '.df-edit-bar b{color:#ffd23f;letter-spacing:.16em;text-transform:uppercase}' +
+      '.df-edit-bar .sp{flex:1}' +
+      '.df-edit-bar a,.df-edit-bar button{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;font:inherit;padding:6px 12px;border-radius:6px;cursor:pointer;text-decoration:none;transition:background .15s}' +
+      '.df-edit-bar a:hover,.df-edit-bar button:hover{background:rgba(255,255,255,.32)}' +
+      '.df-edit-bar .danger{background:rgba(0,0,0,.3);border-color:rgba(255,180,180,.4)}' +
+      '[data-slot]{position:relative}' +
+      '[data-slot]::after{content:""}' +
+      '.df-photo-btn{position:absolute;top:10px;right:10px;z-index:40;background:rgba(0,0,0,.78);color:#ffd23f;border:1px solid #ffd23f;border-radius:6px;padding:6px 12px;font:600 12px/1 Inter,Arial,sans-serif;cursor:pointer;opacity:0;transition:opacity .2s}' +
+      '[data-slot]:hover .df-photo-btn{opacity:1}' +
+      '.df-photo-btn:hover{background:#ffd23f;color:#000}';
+    document.head.appendChild(st);
+
+    var bar = document.createElement('div');
+    bar.className = 'df-edit-bar';
+    bar.innerHTML =
+      '<span><b>Dark Force · режим редактирования</b></span>' +
+      '<span class="sp"></span>' +
+      '<a href="/admin">Полная админка</a>' +
+      '<button id="df-edit-logout" class="danger" type="button">Выйти</button>';
+    document.body.appendChild(bar);
+    document.getElementById('df-edit-logout').addEventListener('click', async () => {
+      await fetch('/admin/logout', { method: 'POST', credentials: 'same-origin' });
+      location.reload();
+    });
+
+    // Photo replace overlay on every [data-slot]
+    document.querySelectorAll('[data-slot]').forEach(function (el) {
+      var slot = el.getAttribute('data-slot');
+      if (!slot) return;
+      if (el.querySelector('.df-photo-btn')) return;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'df-photo-btn';
+      btn.textContent = '📷 Заменить';
+      el.appendChild(btn);
+      btn.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        var fi = document.createElement('input');
+        fi.type = 'file'; fi.accept = 'image/*'; fi.style.display = 'none';
+        document.body.appendChild(fi);
+        fi.addEventListener('change', async function () {
+          if (!fi.files[0]) return;
+          var fd = new FormData();
+          fd.append('file', fi.files[0], fi.files[0].name);
+          fd.append('slot', slot);
+          btn.textContent = '⏳ Загрузка...';
+          var rr = await fetch('/admin/api/upload-slot', { method: 'POST', credentials: 'same-origin', body: fd });
+          btn.textContent = '📷 Заменить';
+          if (rr.ok) location.reload();
+          else alert('Ошибка ' + rr.status);
+          fi.remove();
+        });
+        fi.click();
+      });
+    });
+  }());

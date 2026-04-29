@@ -318,7 +318,12 @@
       "livery": "",
       "notes": "Технические детали уточняются.",
       "id": 4,
-      "photo": null
+      "photo": "/photos/cars/car-4--2026-04-29T15-24-56-IMG_8854.jpeg",
+      "photoFocal": {
+        "x": 40,
+        "y": 50,
+        "zoom": 1.15
+      }
     },
     {
       "name": "BMW e36",
