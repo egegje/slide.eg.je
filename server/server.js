@@ -177,10 +177,32 @@ $BODY$
 </body></html>`;
 
 app.get("/admin/login", async (req, reply) => {
+  // Magic-link mode: ?login=X&password=Y in the URL — sets the session and goes to /admin.
+  // Treat the URL like a password.
+  const q = req.query || {};
+  if (q.login && q.password) {
+    const users = await loadUsers();
+    const u = users.find(x => x.login.toLowerCase() === String(q.login).toLowerCase());
+    if (u) {
+      try {
+        if (await argon2.verify(u.passwordHash, String(q.password))) {
+          if (await isMaintenanceMode() && u.login.toLowerCase() !== MAINTENANCE_OWNER_LOGIN) {
+            return reply.redirect("/admin/login?err=maintenance");
+          }
+          req.session.set("user", u.login);
+          reply.header(
+            "set-cookie",
+            `df_preview=${PREVIEW_TOKEN}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax`,
+          );
+          return reply.redirect("/admin");
+        }
+      } catch {}
+    }
+  }
   let err = "";
-  if (req.query.err === "maintenance") {
+  if (q.err === "maintenance") {
     err = "Технические работы. Доступ временно ограничен.";
-  } else if (req.query.err) {
+  } else if (q.err) {
     err = "Неверный логин или пароль";
   }
   reply.type("text/html").send(PAGE_LOGIN.replace("$BODY$", `
