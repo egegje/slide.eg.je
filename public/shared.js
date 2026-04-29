@@ -265,3 +265,109 @@
       });
     });
   }());
+
+  // === Inline editing of entity text (driver/car/track) ===
+  (async function () {
+    var inIframe = window.parent && window.parent !== window;
+    if (inIframe) return;
+    if ((location.search || '').indexOf('draft=1') !== -1) return;
+    try {
+      var r = await fetch('/admin/api/whoami', { credentials: 'same-origin' });
+      if (!r.ok) return;
+      if (!(await r.json()).authed) return;
+    } catch (e) { return; }
+
+    var st = document.createElement('style');
+    st.textContent =
+      '[data-edit-field]{outline:1px dashed transparent;outline-offset:2px;cursor:text;transition:outline-color .15s}' +
+      '[data-edit-field]:hover{outline-color:rgba(255,210,63,.6)}' +
+      '[data-edit-field]:focus{outline:2px solid #ffd23f!important;background:rgba(255,210,63,.06)}';
+    document.head.appendChild(st);
+
+    function fieldsForSlot(slot) {
+      // Driver fields editable inline: name (fold first+last) and car string.
+      if (slot.startsWith('driver-')) return [
+        { sel: '.name', field: 'name' },
+        { sel: '.car', field: 'car' },
+      ];
+      if (slot.startsWith('car-')) return [
+        { sel: '.name', field: 'name' },
+        { sel: '.car', field: 'engine' },  // car cards show engine in .car
+      ];
+      if (slot.startsWith('track-')) return [
+        { sel: '.name', field: 'name' },
+      ];
+      return [];
+    }
+
+    function patchUrlForSlot(slot) {
+      if (slot.startsWith('driver-')) return '/admin/api/drivers/' + slot.slice(7);
+      if (slot.startsWith('car-'))    return '/admin/api/cars/' + slot.slice(4);
+      if (slot.startsWith('track-'))  return '/admin/api/tracks/' + encodeURIComponent(slot.slice(6));
+      return null;
+    }
+
+    function activateSlot(el) {
+      var slot = el.getAttribute('data-slot');
+      if (!slot) return;
+      var url = patchUrlForSlot(slot);
+      if (!url) return;
+      fieldsForSlot(slot).forEach(function (cfg) {
+        var t = el.querySelector(cfg.sel);
+        if (!t || t.dataset.editField) return;
+        t.setAttribute('contenteditable', 'true');
+        t.setAttribute('spellcheck', 'false');
+        t.dataset.editField = cfg.field;
+        t.dataset.patchUrl = url;
+      });
+    }
+
+    var pending = new Map(); // url → {field: value}
+    var saveTimer = null;
+
+    function flush() {
+      pending.forEach(function (body, url) {
+        fetch(url, {
+          method: 'PATCH',
+          headers: { 'content-type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(body),
+        }).catch(function () {});
+      });
+      pending.clear();
+    }
+
+    document.addEventListener('input', function (e) {
+      var el = e.target.closest && e.target.closest('[data-edit-field]');
+      if (!el) return;
+      var url = el.dataset.patchUrl;
+      var field = el.dataset.editField;
+      var val = (el.textContent || '').trim();
+      var bag = pending.get(url) || {};
+      bag[field] = val;
+      pending.set(url, bag);
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(flush, 700);
+    });
+    document.addEventListener('blur', function (e) {
+      if (e.target.closest && e.target.closest('[data-edit-field]')) {
+        clearTimeout(saveTimer);
+        flush();
+      }
+    }, true);
+
+    // Run after DOM and after data-driven render. drift-data.js does sync XHR
+    // before DOMContentLoaded, but card render is in inline scripts that fire
+    // on DOMContentLoaded. Use a small delay + observer fallback.
+    function applyAll() {
+      document.querySelectorAll('[data-slot]').forEach(activateSlot);
+    }
+    if (document.readyState === 'complete') applyAll();
+    else document.addEventListener('DOMContentLoaded', () => setTimeout(applyAll, 100));
+    // Re-apply if DOM mutates (hot re-render)
+    var mo = new MutationObserver(function () {
+      clearTimeout(applyAll._t);
+      applyAll._t = setTimeout(applyAll, 100);
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  }());
