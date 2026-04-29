@@ -164,3 +164,31 @@
     });
   });
 })();
+
+  // === Draft mode bidirectional click → admin slot ===
+  // When the page is opened inside the admin preview iframe with ?draft=1,
+  // any click on a [data-slot] element posts back to the admin so it can
+  // open the matching photo / entity slot. Hovering paints a yellow outline.
+  (function () {
+    var inIframe = window.parent && window.parent !== window;
+    var inDraft = (location.search || '').indexOf('draft=1') !== -1;
+    if (!inIframe || !inDraft) return;
+
+    var style = document.createElement('style');
+    style.textContent =
+      '[data-slot]{cursor:pointer;outline:1px dashed transparent;outline-offset:2px;transition:outline-color .15s}' +
+      '[data-slot]:hover{outline-color:rgba(255,240,99,.65)}';
+    document.head.appendChild(style);
+
+    document.addEventListener('click', function (e) {
+      var slotted = e.target.closest && e.target.closest('[data-slot]');
+      if (!slotted) return;
+      var a = e.target.closest && e.target.closest('a');
+      if (a) {
+        var href = a.getAttribute('href') || '';
+        if (!href.startsWith('#')) e.preventDefault();
+      }
+      var slot = slotted.getAttribute('data-slot');
+      try { window.parent.postMessage({ type: 'darkforce:slot-click', slot: slot }, '*'); } catch (err) {}
+    }, true);
+  }());

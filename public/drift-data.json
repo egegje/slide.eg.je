@@ -1,13 +1,13 @@
 {
   "drivers": [
     {
-      "rank": 4,
-      "name": "Vaughn Gittin Jr.",
-      "flag": "🇺🇸",
-      "country": "США",
-      "car": "Ford Mustang RTR Spec 5-D",
-      "engine": "Aluminator 5.2L V8",
-      "hp": 900,
+      "rank": 1,
+      "name": "Andrey Denisov",
+      "flag": null,
+      "country": "Russia",
+      "car": "Nissan 370z",
+      "engine": "2jz ",
+      "hp": 850,
       "boost": "Roush Supercharger",
       "diff": "Winters",
       "tires": "Nitto NT555",
@@ -20,17 +20,17 @@
         "usa"
       ],
       "category": "world",
-      "photo": null,
+      "photo": "/photos/drivers/driver-1--2026-04-28T21-32-36-r2.png",
       "instagram": null
     },
     {
-      "rank": 3,
-      "name": "Chris Forsberg",
+      "rank": 2,
+      "name": "Vlad Katin",
       "flag": "🇺🇸",
       "country": "США",
-      "car": "Nissan 370Z",
-      "engine": "VQ37 Twin Turbo",
-      "hp": 1000,
+      "car": "Corvette c6",
+      "engine": "LS2",
+      "hp": 500,
       "boost": "Garrett G30 x2",
       "diff": "Winters",
       "tires": "Nexen N'Fera",
@@ -44,17 +44,17 @@
         "1000hp"
       ],
       "category": "world",
-      "photo": null,
+      "photo": "/photos/drivers/driver-2--2026-04-28T21-33-33-r3.png",
       "instagram": null
     },
     {
-      "rank": 5,
-      "name": "Ken Gushi",
-      "flag": "🇺🇸🇯🇵",
-      "country": "США / Япония",
-      "car": "Toyota GR86",
-      "engine": "2JZ-GTE",
-      "hp": 900,
+      "rank": 3,
+      "name": "Aleksandr Dikunov",
+      "flag": null,
+      "country": "Russia",
+      "car": "",
+      "engine": "",
+      "hp": 0,
       "boost": "Garrett G35",
       "diff": "OS Giken",
       "tires": "Falken",
@@ -65,17 +65,17 @@
         "japan"
       ],
       "category": "world",
-      "photo": null,
+      "photo": "/photos/drivers/driver-3--2026-04-28T21-34-48-r1.png",
       "instagram": null
     },
     {
-      "rank": 6,
-      "name": "Matt Field",
+      "rank": 4,
+      "name": "Tigran Avetisyan",
       "flag": "🇺🇸",
       "country": "США",
-      "car": "Chevrolet Corvette C6",
-      "engine": "LS7 Supercharged",
-      "hp": 1050,
+      "car": "NIssan 350z",
+      "engine": "VH35DE",
+      "hp": 400,
       "boost": "Magnuson Supercharger",
       "diff": "Winters",
       "tires": "Falken",
@@ -90,421 +90,20 @@
       "instagram": null
     },
     {
-      "rank": 7,
-      "name": "Ryan Tuerck",
-      "flag": "🇺🇸",
-      "country": "США",
-      "car": "Toyota 86 (GT4586)",
-      "engine": "Ferrari 458 4.5L V8 swap",
-      "hp": 500,
-      "boost": "N/A",
-      "diff": "Winters",
-      "tires": "Nitto",
-      "titles": [],
-      "tags": [
-        "v8",
-        "usa"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 8,
-      "name": "Chelsea DeNofa",
-      "flag": "🇺🇸",
-      "country": "США",
-      "car": "Ford Mustang RTR",
-      "engine": "5.0 Coyote Supercharged",
-      "hp": 1000,
-      "boost": "Supercharger",
-      "diff": "Winters",
-      "tires": "BC Racing",
-      "titles": [],
-      "tags": [
-        "v8",
-        "usa",
-        "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 9,
-      "name": "Adam LZ",
-      "flag": "🇺🇸",
-      "country": "США",
-      "car": "Nissan S15 Silvia",
-      "engine": "2JZ-GTE",
-      "hp": 800,
-      "boost": "Precision 6766",
-      "diff": "OS Giken",
-      "tires": "Nitto",
-      "titles": [],
-      "tags": [
-        "jz",
-        "usa"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 10,
-      "name": "Masato Kawabata",
-      "flag": "🇯🇵",
-      "country": "Япония",
-      "car": "Nissan GT-R R35",
-      "engine": "VR38DETT",
-      "hp": 1000,
-      "boost": "HKS GT1000",
-      "diff": "OS Giken",
-      "tires": "Yokohama",
-      "titles": [
-        "D1GP — Nissan GT-R R35"
-      ],
-      "tags": [
-        "champion",
-        "japan",
-        "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 11,
-      "name": "Daigo Saito",
-      "flag": "🇯🇵",
-      "country": "Япония",
-      "car": "Toyota GR Supra A90",
-      "engine": "2JZ-GTE",
-      "hp": 1200,
-      "boost": "HKS T04Z",
-      "diff": "OS Giken",
-      "tires": "Achilles",
-      "titles": [
-        "D1GP — Toyota GR Supra A90"
-      ],
-      "tags": [
-        "champion",
-        "jz",
-        "japan",
-        "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 12,
-      "name": "Keiichi Tsuchiya",
-      "flag": "🇯🇵",
-      "country": "Япония",
-      "car": "Toyota AE86 Sprinter Trueno",
-      "engine": "4A-GE 1.6L",
-      "hp": 240,
-      "boost": "N/A",
-      "diff": "TRD LSD",
-      "tires": "Advan",
-      "titles": [
-        "Drift King 🏆 — Toyota AE86"
-      ],
-      "tags": [
-        "champion",
-        "japan"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 13,
-      "name": "\"Mad Mike\" Whiddett",
-      "flag": "🇳🇿",
-      "country": "Новая Зеландия",
-      "car": "Mazda RX-7 FD",
-      "engine": "4-Rotor 26B",
-      "hp": 1200,
-      "boost": "Garrett G42",
-      "diff": "Winters",
-      "tires": "Nitto",
-      "titles": [],
-      "tags": [
-        "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 14,
-      "name": "Георгий \"Гоча\" Чивчян",
+      "rank": 5,
+      "name": "Nikita Sapelin",
       "flag": "🇷🇺",
-      "country": "Россия",
-      "car": "Nissan S15 Silvia",
-      "engine": "2JZ-GTE",
-      "hp": 900,
-      "boost": "Precision 6870",
-      "diff": "Winters",
-      "tires": "GT Radial",
-      "titles": [
-        "FD Pro — Nissan S15 Silvia"
-      ],
-      "tags": [
-        "champion",
-        "jz"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 15,
-      "name": "Piotr Więcek",
-      "flag": "🇵🇱",
-      "country": "Польша",
-      "car": "Nissan S14",
-      "engine": "2JZ-GTE",
-      "hp": 1000,
-      "boost": "BorgWarner EFR 9180",
-      "diff": "Winters",
-      "tires": "Falken",
-      "titles": [
-        "Drift Masters — Nissan S14"
-      ],
-      "tags": [
-        "champion",
-        "jz",
-        "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 16,
-      "name": "Aurimas \"Odi\" Bakchis",
-      "flag": "🇱🇹🇺🇸",
-      "country": "Литва / США",
-      "car": "Nissan 240SX S14",
-      "engine": "SR20DET 2.2L",
-      "hp": 800,
-      "boost": "Garrett GTX3582R",
-      "diff": "Winters",
-      "tires": "Falken",
-      "titles": [],
-      "tags": [
-        "usa"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 17,
-      "name": "Dean Kearney",
-      "flag": "🇮🇪",
-      "country": "Ирландия",
-      "car": "Dodge Viper SRT",
-      "engine": "8.4L V10",
-      "hp": 1250,
-      "boost": "Twin Turbo",
-      "diff": "Winters",
-      "tires": "Achilles",
-      "titles": [],
-      "tags": [
-        "v8",
-        "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 18,
-      "name": "Hiroya Minowa",
-      "flag": "🇯🇵",
-      "country": "Япония",
-      "car": "Toyota GT86",
-      "engine": "2JZ-GTE",
-      "hp": 850,
-      "boost": "Garrett",
-      "diff": "OS Giken",
-      "tires": "Falken",
-      "titles": [
-        "FD Rookie 2024 — Toyota GT86"
-      ],
-      "tags": [
-        "jz",
-        "japan"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 19,
-      "name": "Николай Константинов",
-      "flag": "🇷🇺",
-      "country": "Россия",
-      "car": "Nissan Silvia S15",
-      "engine": "RB26DETT",
-      "hp": 900,
-      "boost": "Garrett G35 x2",
-      "diff": "OS Giken",
-      "tires": "Federal",
-      "titles": [
-        "RDS — Nissan Silvia S15"
-      ],
-      "tags": [
-        "champion"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 20,
-      "name": "Дмитрий Ершов",
-      "flag": "🇷🇺",
-      "country": "Россия",
-      "car": "Toyota Mark II JZX100",
-      "engine": "1JZ-GTE",
-      "hp": 700,
-      "boost": "Garrett GTX3076R",
-      "diff": "OS Giken",
-      "tires": "Federal",
-      "titles": [],
-      "tags": [],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 21,
-      "name": "Аркадий Цареградцев",
-      "flag": "🇷🇺",
-      "country": "Россия",
-      "car": "Nissan 370Z",
-      "engine": "2JZ-GTE swap",
-      "hp": 800,
-      "boost": "Single turbo",
-      "diff": "Winters",
-      "tires": "Federal",
-      "titles": [
-        "RDS GP — многократный призёр",
-        "Чемпион России по дрифту 2015"
-      ],
-      "tags": [
-        "jz"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 22,
-      "name": "Артём Шабанов",
-      "flag": "🇷🇺",
-      "country": "Россия",
-      "car": "Toyota Supra A80",
-      "engine": "2JZ-GTE",
-      "hp": 900,
-      "boost": "Garrett",
-      "diff": "OS Giken",
-      "tires": "Nankang",
-      "titles": [
-        "RDS GP участник",
-        "Призёр этапов"
-      ],
-      "tags": [
-        "jz"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 24,
-      "name": "Conor Shanahan",
-      "flag": "🇮🇪",
-      "country": "Ирландия",
-      "car": "Nissan Silvia S15",
-      "engine": "2JZ-GTE",
-      "hp": 1200,
-      "boost": "Twin Garrett",
-      "diff": "Winters",
-      "tires": "Nexen",
-      "titles": [
-        "FD 2023 — Rookie of the Year",
-        "FD 2025 — контендер титула"
-      ],
-      "tags": [
-        "jz",
-        "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 25,
-      "name": "Jack Shanahan",
-      "flag": "🇮🇪",
-      "country": "Ирландия",
-      "car": "Nissan Silvia S15",
-      "engine": "2JZ-GTE",
-      "hp": 1100,
-      "boost": "Garrett",
-      "diff": "Winters",
-      "tires": "Nexen",
-      "titles": [
-        "Drift Masters Europe — чемпион 2020",
-        "FD Pro участник"
-      ],
-      "tags": [
-        "champion",
-        "jz",
-        "1000hp"
-      ],
-      "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 26,
-      "name": "Andrey Denisov",
-      "flag": null,
       "country": "Russia",
-      "car": "Nissan 370z",
-      "engine": "2jz",
-      "hp": 850,
+      "car": "",
+      "engine": "",
+      "hp": 0,
       "boost": null,
       "diff": null,
       "tires": null,
       "titles": [],
       "tags": [],
       "category": "world",
-      "photo": null,
-      "instagram": null
-    },
-    {
-      "rank": 27,
-      "name": "Andrey Denisov",
-      "flag": "🐥",
-      "country": "Russia",
-      "car": "Nissan 370z",
-      "engine": "2jz",
-      "hp": 850,
-      "boost": null,
-      "diff": null,
-      "tires": null,
-      "titles": [],
-      "tags": [],
-      "category": "world",
-      "photo": null,
+      "photo": "/photos/drivers/driver-5--2026-04-29T02-13-44-IMG_8830.png",
       "instagram": null
     }
   ],
@@ -650,7 +249,12 @@
       "livery": "AutoWorldArt",
       "notes": "Главная боевая машина команды. Конфигурация под Pro-уровень соревнований.",
       "id": 1,
-      "photo": null
+      "photo": "/photos/cars/car-1--2026-04-28T21-40-40-_1315237.JPEG",
+      "photoFocal": {
+        "x": 30,
+        "y": 50,
+        "zoom": 2.1
+      }
     },
     {
       "name": "Nissan 370z «Drift Missile»",
@@ -668,7 +272,12 @@
       "livery": "",
       "notes": "Атмосферный «снаряд» с закисью. Лёгкий, маневренный — для local-сессий и тренировок.",
       "id": 2,
-      "photo": null
+      "photo": "/photos/cars/car-2--2026-04-29T02-19-37-IMG_8277.jpeg",
+      "photoFocal": {
+        "x": 38,
+        "y": 50,
+        "zoom": 1
+      }
     },
     {
       "name": "BMW e61 Drift Taxi",
@@ -686,7 +295,12 @@
       "livery": "CIAY",
       "notes": "Drift-taxi для гостевых заездов. MilSpec-проводка под нагрузки.",
       "id": 3,
-      "photo": null
+      "photo": "/photos/cars/car-3--2026-04-28T21-43-10-sides_prw.jpg",
+      "photoFocal": {
+        "x": 59,
+        "y": 50,
+        "zoom": 1
+      }
     },
     {
       "name": "Chevrolet Corvette C6",

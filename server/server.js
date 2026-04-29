@@ -1270,6 +1270,27 @@ const DASH_HTML = `<!doctype html>
     if (state.activeSlot) highlightInFrame(state.activeSlot);
   });
 
+  // Click on a [data-slot] block in the iframe preview → open that slot in admin.
+  window.addEventListener('message', (ev) => {
+    if (!ev.data || ev.data.type !== 'darkforce:slot-click') return;
+    const slot = ev.data.slot;
+    if (!slot) return;
+    selectSlot(slot);
+    // Flash the matching DOM slot in the rail.
+    setTimeout(() => {
+      const slotEl = document.querySelector('[data-slot-id="' + slot + '"]')
+        || document.querySelector('.slot[data-id="' + slot + '"]')
+        || document.querySelector('#slot-' + slot);
+      if (slotEl) {
+        slotEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        slotEl.style.transition = 'box-shadow .2s, outline .2s';
+        slotEl.style.outline = '2px solid var(--accent, #ff6b35)';
+        slotEl.style.boxShadow = '0 0 0 6px rgba(255,107,53,0.18)';
+        setTimeout(() => { slotEl.style.outline = ''; slotEl.style.boxShadow = ''; }, 1500);
+      }
+    }, 80);
+  });
+
   loadAll();
 </script>
 </body></html>`;
