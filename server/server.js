@@ -418,12 +418,11 @@ const DASH_HTML = `<!doctype html>
   <aside class="rail" id="rail"></aside>
   <main class="preview">
     <div class="preview__bar">
-      <button data-variant="apex" class="on" onclick="setVariant('apex')">Apex</button>
-      <button data-variant="paddock" onclick="setVariant('paddock')">Paddock</button>
+      <button data-variant="paddock" class="on" onclick="setVariant('paddock')">Paddock</button>
       <span class="grow"></span>
-      <span class="url" id="frame-url">/apex/home.html</span>
+      <span class="url" id="frame-url">/paddock/home.html</span>
     </div>
-    <div class="frame-wrap"><iframe class="frame" id="frame" src="/apex/home.html?draft=1"></iframe></div>
+    <div class="frame-wrap"><iframe class="frame" id="frame" src="/paddock/home.html?draft=1"></iframe></div>
   </main>
 </div>
 <button id="rail-toggle" type="button" title="Скрыть/показать панель"></button>
@@ -432,7 +431,7 @@ const DASH_HTML = `<!doctype html>
   const SPECS = $SPECS$;
 
   let state = {
-    variant: 'apex',
+    variant: 'paddock',
     page: 'home',
     activeSlot: null,
     newForm: null,        // null | 'driver' | 'track' | 'car' — which inline form is open

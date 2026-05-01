@@ -1,0 +1,103 @@
+/* ============================================
+   Dark Force / drift.eg.je — mobile polish
+   Loaded after apex.css / paddock.css
+   Goal: same defensive mobile rules as sugoria.
+   ============================================ */
+
+/* iOS / safari hygiene */
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { -webkit-font-smoothing: antialiased; }
+input, textarea, select { font-size: 16px; }   /* prevent iOS zoom */
+
+/* Defeat the classic `padding: <top> 0 <bottom>` bug — never let any
+   container collapse its horizontal padding to 0 on phones. */
+@media (max-width: 720px) {
+  /* shared layout containers */
+  .apex-section, .apex-cta, .apex-footer,
+  .paddock-section, .paddock-cta, .paddock-footer,
+  .nav, .topbar, .topbar__inner {
+    padding-left: clamp(16px, 5vw, 28px) !important;
+    padding-right: clamp(16px, 5vw, 28px) !important;
+  }
+}
+
+/* Touch targets — every interactive control should be tap-friendly */
+@media (max-width: 900px) {
+  a, button, .btn, .topbar__burger {
+    min-height: 44px;
+  }
+  .nav a { padding: 14px 0; }
+}
+
+/* Container clip + max-width safety net so big headlines never push the
+   layout sideways. */
+@media (max-width: 720px) {
+  body, main { overflow-x: clip; }
+  .apex-section > *, .paddock-section > * { max-width: 100%; }
+  h1, h2, h3 { overflow-wrap: anywhere; word-break: normal; }
+}
+
+/* Common Hero / driver / track grids — single col on phones with
+   breathing space. */
+@media (max-width: 600px) {
+  .apex-drivers-top, .apex-tracks, .apex-services,
+  .paddock-drivers, .paddock-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .apex-driver, .paddock-driver { min-height: 220px; }
+}
+
+/* ============================================
+   Mobile drawer — make it OPAQUE and ABOVE everything.
+   Without this, big hero typography (paddock PIT/PADDOCK/TRACKS,
+   apex headlines) can bleed through the menu.
+   ============================================ */
+@media (max-width: 820px) {
+  .topbar { z-index: 60 !important; }
+  .nav {
+    background: oklch(0.10 0.012 250) !important;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    z-index: 200 !important;
+    box-shadow: 0 12px 40px oklch(0 0 0 / 0.6);
+  }
+  /* Solid backdrop layer behind the drawer so nothing leaks through */
+  .nav::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: oklch(0.10 0.012 250);
+    z-index: -1;
+  }
+  .topbar--open .nav { z-index: 200 !important; }
+  .topbar--open .topbar__burger { z-index: 210 !important; position: relative; }
+  /* Lock body scroll while drawer is open */
+  body:has(.topbar--open) { overflow: hidden; }
+}
+
+/* iOS safe-area + sticky topbar safety */
+@supports (padding: max(0px)) {
+  body { padding-bottom: env(safe-area-inset-bottom); }
+  .topbar, .nav {
+    padding-top: max(10px, env(safe-area-inset-top)) !important;
+  }
+}
+
+/* Prevent over-large headings clipping on narrowest phones */
+@media (max-width: 380px) {
+  .apex-section h1, .apex-section h2,
+  .paddock-section h1, .paddock-section h2 {
+    font-size: clamp(28px, 9vw, 40px) !important;
+    line-height: 1.04 !important;
+  }
+}
+
+/* prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

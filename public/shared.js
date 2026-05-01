@@ -165,10 +165,10 @@
   });
 })();
 
-  // === Draft mode bidirectional click → admin slot ===
-  // When the page is opened inside the admin preview iframe with ?draft=1,
-  // any click on a [data-slot] element posts back to the admin so it can
-  // open the matching photo / entity slot. Hovering paints a yellow outline.
+  // === Unified edit mode ===
+  // The site is editable ONLY inside the admin iframe (/admin → iframe with
+  // ?draft=1). On the live site, even if the admin is logged in, we render
+  // nothing — there is one single editing surface (/admin) instead of two.
   (function () {
     var inIframe = window.parent && window.parent !== window;
     var inDraft = (location.search || '').indexOf('draft=1') !== -1;
@@ -180,10 +180,15 @@
       '[data-slot]:hover{outline-color:rgba(255,240,99,.65)}';
     document.head.appendChild(style);
 
+    // Click on slot → postMessage to admin so the matching slot opens in the
+    // rail. Skip clicks on photo controls and contenteditable text — those
+    // have their own behavior.
     document.addEventListener('click', function (e) {
-      var slotted = e.target.closest && e.target.closest('[data-slot]');
+      var t = e.target;
+      if (t.closest && (t.closest('.df-photo-ctl') || t.closest('[contenteditable="true"]'))) return;
+      var slotted = t.closest && t.closest('[data-slot]');
       if (!slotted) return;
-      var a = e.target.closest && e.target.closest('a');
+      var a = t.closest && t.closest('a');
       if (a) {
         var href = a.getAttribute('href') || '';
         if (!href.startsWith('#')) e.preventDefault();
@@ -193,16 +198,19 @@
     }, true);
   }());
 
-  // === Inline edit mode (when admin is logged in, OUTSIDE the admin iframe) ===
+  // === Edit-mode indicator on live site (orange bar, no inline editing here) ===
+  // When the admin is logged in and visits the public site directly (not via
+  // /admin), show a slim orange bar so it's obvious that an admin session is
+  // active. Editing itself happens only inside /admin.
   (async function () {
     var inIframe = window.parent && window.parent !== window;
-    if (inIframe) return;  // admin iframe already has the overlay
-    if ((location.search || '').indexOf('draft=1') !== -1) return; // explicit draft preview only
+    if (inIframe) return;
+    if ((location.search || '').indexOf('draft=1') !== -1) return;
+    if ((location.pathname || '').indexOf('/admin') === 0) return;
     try {
       var r = await fetch('/admin/api/whoami', { credentials: 'same-origin' });
       if (!r.ok) return;
-      var who = await r.json();
-      if (!who.authed) return;
+      if (!(await r.json()).authed) return;
     } catch (e) { return; }
 
     var st = document.createElement('style');
@@ -213,12 +221,7 @@
       '.df-edit-bar .sp{flex:1}' +
       '.df-edit-bar a,.df-edit-bar button{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;font:inherit;padding:6px 12px;border-radius:6px;cursor:pointer;text-decoration:none;transition:background .15s}' +
       '.df-edit-bar a:hover,.df-edit-bar button:hover{background:rgba(255,255,255,.32)}' +
-      '.df-edit-bar .danger{background:rgba(0,0,0,.3);border-color:rgba(255,180,180,.4)}' +
-      '[data-slot]{position:relative}' +
-      '[data-slot]::after{content:""}' +
-      '.df-photo-btn{position:absolute;top:10px;right:10px;z-index:40;background:rgba(0,0,0,.78);color:#ffd23f;border:1px solid #ffd23f;border-radius:6px;padding:6px 12px;font:600 12px/1 Inter,Arial,sans-serif;cursor:pointer;opacity:0;transition:opacity .2s}' +
-      '[data-slot]:hover .df-photo-btn{opacity:1}' +
-      '.df-photo-btn:hover{background:#ffd23f;color:#000}';
+      '.df-edit-bar .danger{background:rgba(0,0,0,.3);border-color:rgba(255,180,180,.4)}';
     document.head.appendChild(st);
 
     var bar = document.createElement('div');
@@ -226,25 +229,94 @@
     bar.innerHTML =
       '<span><b>Dark Force · режим редактирования</b></span>' +
       '<span class="sp"></span>' +
-      '<a href="/admin">Полная админка</a>' +
+      '<a href="/admin">Открыть админку</a>' +
       '<button id="df-edit-logout" class="danger" type="button">Выйти</button>';
     document.body.appendChild(bar);
     document.getElementById('df-edit-logout').addEventListener('click', async () => {
       await fetch('/admin/logout', { method: 'POST', credentials: 'same-origin' });
       location.reload();
     });
+  }());
 
-    // Photo replace overlay on every [data-slot]
-    document.querySelectorAll('[data-slot]').forEach(function (el) {
+  // === Photo overlay (Заменить / Сбросить / Кадрировать) inside admin iframe ===
+  (function () {
+    var inIframe = window.parent && window.parent !== window;
+    var inDraft = (location.search || '').indexOf('draft=1') !== -1;
+    if (!inIframe || !inDraft) return;
+
+    var st = document.createElement('style');
+    st.textContent =
+      '[data-slot]{position:relative}' +
+      '.df-photo-ctl{position:absolute;top:10px;right:10px;z-index:40;display:flex;flex-direction:column;gap:6px;align-items:flex-end;pointer-events:none}' +
+      '.df-photo-ctl > *{pointer-events:auto}' +
+      '.df-photo-btn{background:rgba(0,0,0,.88);color:#ffd23f;border:2px solid #ffd23f;border-radius:8px;padding:7px 12px;font:700 12px/1 Inter,Arial,sans-serif;cursor:pointer;opacity:.95;transition:transform .15s,box-shadow .2s,background .15s,color .15s;box-shadow:0 4px 14px rgba(0,0,0,.5);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}' +
+      '[data-slot]:hover .df-photo-btn{box-shadow:0 6px 22px rgba(255,210,63,.5)}' +
+      '.df-photo-btn:hover{background:#ffd23f;color:#1a1a1a}' +
+      '.df-photo-btn.danger{color:#ff8a80;border-color:#ff8a80}' +
+      '.df-photo-btn.danger:hover{background:#ff8a80;color:#1a1a1a}' +
+      '.df-photo-btn.on{background:#ffd23f;color:#1a1a1a}' +
+      '[data-slot].df-cropping{outline:3px solid #ffd23f;outline-offset:-3px}' +
+      '[data-slot].df-cropping .ph.has-photo,[data-slot].df-cropping .photo,[data-slot].df-cropping img{cursor:grab}' +
+      '[data-slot].df-cropping .ph.has-photo.df-drag,[data-slot].df-cropping .photo.df-drag,[data-slot].df-cropping img.df-drag{cursor:grabbing}' +
+      '.df-crop-hint{position:absolute;bottom:10px;left:10px;z-index:40;background:rgba(0,0,0,.88);color:#ffd23f;border:1px solid #ffd23f;border-radius:6px;padding:6px 10px;font:600 11px/1.3 Inter,Arial,sans-serif;pointer-events:none;max-width:60%}';
+    document.head.appendChild(st);
+
+    // ---- Cropper helpers (shared across all slots in inline edit mode) ----
+    var saveTimers = new Map();
+    function debouncedSaveFocal(slot, x, y, zoom) {
+      clearTimeout(saveTimers.get(slot));
+      saveTimers.set(slot, setTimeout(function () {
+        fetch('/admin/api/save-focal', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ slot: slot, x: x, y: y, zoom: zoom }),
+        }).catch(function () {});
+      }, 350));
+    }
+    function findPhotoEl(slotEl) {
+      return slotEl.querySelector('.ph.has-photo')
+        || slotEl.querySelector('.photo')
+        || slotEl.querySelector('img');
+    }
+    function readFocal(slotEl) {
+      var p = findPhotoEl(slotEl); if (!p) return { x: 50, y: 50, zoom: 1 };
+      var x = parseFloat((p.style.getPropertyValue('--focal-x') || '50').replace('%','')) || 50;
+      var y = parseFloat((p.style.getPropertyValue('--focal-y') || '50').replace('%','')) || 50;
+      var z = parseFloat(p.style.getPropertyValue('--zoom')) || 1;
+      return { x: x, y: y, zoom: z };
+    }
+    function applyFocal(slotEl, f) {
+      var p = findPhotoEl(slotEl); if (!p) return;
+      p.style.setProperty('--focal-x', f.x + '%');
+      p.style.setProperty('--focal-y', f.y + '%');
+      p.style.setProperty('--zoom', f.zoom);
+      // Fallback for plain <img>
+      if (p.tagName === 'IMG') {
+        p.style.objectPosition = f.x + '% ' + f.y + '%';
+        p.style.transform = 'scale(' + f.zoom + ')';
+        p.style.transformOrigin = f.x + '% ' + f.y + '%';
+      }
+    }
+
+    // Photo overlay (Заменить / Сбросить / Кадрировать) on every [data-slot]
+    function attachPhotoOverlay(el) {
       var slot = el.getAttribute('data-slot');
       if (!slot) return;
-      if (el.querySelector('.df-photo-btn')) return;
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'df-photo-btn';
-      btn.textContent = '📷 Заменить';
-      el.appendChild(btn);
-      btn.addEventListener('click', function (e) {
+      if (el.querySelector('.df-photo-ctl')) return;
+
+      var ctl = document.createElement('div');
+      ctl.className = 'df-photo-ctl';
+      ctl.innerHTML =
+        '<button type="button" class="df-photo-btn" data-act="replace">📷 Заменить</button>' +
+        '<button type="button" class="df-photo-btn danger" data-act="reset">✕ Сбросить</button>' +
+        '<button type="button" class="df-photo-btn" data-act="crop">🎯 Кадрировать</button>';
+      el.appendChild(ctl);
+
+      var btnReplace = ctl.querySelector('[data-act="replace"]');
+      var btnReset   = ctl.querySelector('[data-act="reset"]');
+      var btnCrop    = ctl.querySelector('[data-act="crop"]');
+
+      btnReplace.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
         var fi = document.createElement('input');
         fi.type = 'file'; fi.accept = 'image/*'; fi.style.display = 'none';
@@ -254,28 +326,115 @@
           var fd = new FormData();
           fd.append('file', fi.files[0], fi.files[0].name);
           fd.append('slot', slot);
-          btn.textContent = '⏳ Загрузка...';
+          btnReplace.textContent = '⏳ Загрузка...';
           var rr = await fetch('/admin/api/upload-slot', { method: 'POST', credentials: 'same-origin', body: fd });
-          btn.textContent = '📷 Заменить';
+          btnReplace.textContent = '📷 Заменить';
           if (rr.ok) location.reload();
           else alert('Ошибка ' + rr.status);
           fi.remove();
         });
         fi.click();
       });
+
+      btnReset.addEventListener('click', async function (e) {
+        e.preventDefault(); e.stopPropagation();
+        if (!confirm('Сбросить фото к стандартному?')) return;
+        btnReset.textContent = '⏳';
+        var rr = await fetch('/admin/api/delete-slot', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ slot: slot }),
+        });
+        btnReset.textContent = '✕ Сбросить';
+        if (rr.ok) location.reload();
+        else alert('Ошибка ' + rr.status);
+      });
+
+      // Cropper toggle + interaction
+      var cropping = false;
+      var dragStart = null;
+      var photoEl = null;
+      var hint = null;
+
+      function onMouseDown(ev) {
+        if (!cropping) return;
+        ev.preventDefault();
+        var f = readFocal(el);
+        dragStart = { sx: ev.clientX, sy: ev.clientY, x: f.x, y: f.y };
+        photoEl && photoEl.classList.add('df-drag');
+      }
+      function onMouseMove(ev) {
+        if (!cropping || !dragStart) return;
+        var rect = el.getBoundingClientRect();
+        // Drag right => focal moves left so content from the left becomes visible.
+        var dx = (ev.clientX - dragStart.sx) / rect.width * 100;
+        var dy = (ev.clientY - dragStart.sy) / rect.height * 100;
+        var nx = Math.max(0, Math.min(100, dragStart.x - dx));
+        var ny = Math.max(0, Math.min(100, dragStart.y - dy));
+        var f = readFocal(el);
+        applyFocal(el, { x: nx, y: ny, zoom: f.zoom });
+        debouncedSaveFocal(slot, nx, ny, f.zoom);
+      }
+      function onMouseUp() {
+        if (!dragStart) return;
+        dragStart = null;
+        photoEl && photoEl.classList.remove('df-drag');
+      }
+      function onWheel(ev) {
+        if (!cropping) return;
+        ev.preventDefault();
+        var f = readFocal(el);
+        var delta = -ev.deltaY / 500;
+        var nz = Math.max(1, Math.min(3, f.zoom + delta));
+        applyFocal(el, { x: f.x, y: f.y, zoom: nz });
+        debouncedSaveFocal(slot, f.x, f.y, nz);
+      }
+
+      btnCrop.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        cropping = !cropping;
+        btnCrop.classList.toggle('on', cropping);
+        el.classList.toggle('df-cropping', cropping);
+        photoEl = findPhotoEl(el);
+        if (cropping) {
+          btnCrop.textContent = '✓ Готово';
+          if (!hint) {
+            hint = document.createElement('div');
+            hint.className = 'df-crop-hint';
+            hint.textContent = 'Тяни — двигать, колесо — приближать';
+            el.appendChild(hint);
+          }
+          el.addEventListener('mousedown', onMouseDown);
+          window.addEventListener('mousemove', onMouseMove);
+          window.addEventListener('mouseup', onMouseUp);
+          el.addEventListener('wheel', onWheel, { passive: false });
+        } else {
+          btnCrop.textContent = '🎯 Кадрировать';
+          if (hint) { hint.remove(); hint = null; }
+          el.removeEventListener('mousedown', onMouseDown);
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          el.removeEventListener('wheel', onWheel);
+        }
+      });
+    }
+    function applyOverlays() {
+      document.querySelectorAll('[data-slot]').forEach(attachPhotoOverlay);
+    }
+    if (document.readyState === 'complete') applyOverlays();
+    else document.addEventListener('DOMContentLoaded', () => setTimeout(applyOverlays, 100));
+    var moPhoto = new MutationObserver(function () {
+      clearTimeout(applyOverlays._t);
+      applyOverlays._t = setTimeout(applyOverlays, 100);
     });
+    moPhoto.observe(document.body, { childList: true, subtree: true });
   }());
 
-  // === Inline editing of entity text (driver/car/track) ===
-  (async function () {
+  // === Inline editing of entity text (driver/car/track) — inside admin iframe only ===
+  (function () {
     var inIframe = window.parent && window.parent !== window;
-    if (inIframe) return;
-    if ((location.search || '').indexOf('draft=1') !== -1) return;
-    try {
-      var r = await fetch('/admin/api/whoami', { credentials: 'same-origin' });
-      if (!r.ok) return;
-      if (!(await r.json()).authed) return;
-    } catch (e) { return; }
+    var inDraft = (location.search || '').indexOf('draft=1') !== -1;
+    if (!inIframe || !inDraft) return;
 
     var st = document.createElement('style');
     st.textContent =
