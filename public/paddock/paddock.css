@@ -723,3 +723,315 @@
   .pad-crew, .pad-tracks, .pad-services { gap: 10px; }
   .pad-footer__grid { grid-template-columns: 1fr; }
 }
+
+/* ─── Calendar: kicker on event card date ─── */
+.pad-event__date .kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 0.78em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.85;
+  margin-right: 4px;
+}
+
+/* ─── NEXT EVENT countdown hero ─── */
+.pad-next {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto minmax(380px, auto) auto;
+  align-items: center;
+  gap: clamp(16px, 3vw, 36px);
+  margin: 28px 0 36px;
+  padding: clamp(18px, 2.5vw, 28px) clamp(20px, 3vw, 36px);
+  border: 2px solid var(--accent);
+  background: oklch(0.13 0.008 55);
+  overflow: hidden;
+}
+.pad-next::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 50% 110%, oklch(0.32 0.18 60 / 0.18), transparent 60%);
+  pointer-events: none;
+}
+.pad-next > * { position: relative; }
+.pad-next .kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 6px;
+}
+.pad-next h3 {
+  font-family: Oswald, sans-serif;
+  font-weight: 700;
+  font-size: clamp(22px, 2.6vw, 32px);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+  color: oklch(0.96 0.005 60);
+}
+.pad-next__sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: oklch(0.66 0.015 60);
+  margin: 0;
+  text-transform: uppercase;
+}
+.pad-next__car {
+  width: clamp(180px, 22vw, 280px);
+  height: auto;
+  filter: drop-shadow(0 8px 14px oklch(0 0 0 / 0.45));
+}
+.pad-next__count {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pad-next__count-lab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: oklch(0.66 0.015 60);
+  margin: 0;
+}
+.pad-next__cells {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(60px, 70px));
+  gap: 14px;
+}
+.pad-next__cells > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-left: 1px solid oklch(0.30 0.02 60);
+  padding-left: 14px;
+}
+.pad-next__cells > div:first-child { border-left: 0; padding-left: 0; }
+.pad-next__cells b {
+  font-family: Oswald, sans-serif;
+  font-weight: 700;
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 0.95;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.pad-next__cells span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: oklch(0.66 0.015 60);
+  margin-top: 4px;
+}
+.pad-next__cta {
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-family: Oswald, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 120ms ease-out, color 120ms ease-out;
+}
+.pad-next__cta:hover { background: var(--accent); color: var(--accent-ink); }
+
+/* ─── EVENT MAP ─── */
+.pad-evmap {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 0;
+  margin: 28px 0;
+  border: 2px solid oklch(0.30 0.02 60);
+  background: oklch(0.13 0.008 55);
+  overflow: hidden;
+}
+.pad-evmap__list {
+  padding: 22px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-right: 1px solid oklch(0.22 0.01 55);
+}
+.pad-evmap__list .kicker {
+  font-family: Oswald, sans-serif;
+  font-weight: 700;
+  font-size: clamp(18px, 1.8vw, 24px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: oklch(0.96 0.005 60);
+  margin-bottom: 0;
+}
+.pad-evmap__sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: oklch(0.66 0.015 60);
+  margin: 0 0 14px;
+  text-transform: uppercase;
+}
+.pad-evmap__row {
+  display: grid;
+  grid-template-columns: 36px 1fr 16px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: oklch(0.16 0.010 55);
+  text-decoration: none;
+  color: inherit;
+  transition: background 120ms ease-out;
+}
+.pad-evmap__row:hover { background: oklch(0.20 0.012 55); }
+.pad-evmap__row .num {
+  display: inline-grid;
+  place-items: center;
+  width: 28px; height: 28px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: Oswald, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.pad-evmap__row .who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pad-evmap__row .who b {
+  font-family: Oswald, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: oklch(0.96 0.005 60);
+}
+.pad-evmap__row .who em {
+  font-family: 'JetBrains Mono', monospace;
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: oklch(0.62 0.015 60);
+  text-transform: uppercase;
+}
+.pad-evmap__row .arr {
+  font-family: Oswald, sans-serif;
+  font-size: 18px;
+  color: var(--accent);
+}
+.pad-evmap__all {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid oklch(0.30 0.02 60);
+  text-decoration: none;
+  color: oklch(0.96 0.005 60);
+  font-family: Oswald, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.pad-evmap__all:hover { border-color: var(--accent); color: var(--accent); }
+.pad-evmap__all span { color: var(--accent); font-size: 16px; }
+.pad-evmap__map {
+  position: relative;
+  margin: 0;
+  background: oklch(0.10 0.005 55);
+  min-height: 360px;
+}
+.pad-evmap__map svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.pad-evmap__pin { cursor: pointer; }
+.pad-evmap__pin circle:nth-of-type(2) {
+  transition: r 120ms ease-out, fill 120ms ease-out;
+}
+.pad-evmap__pin:hover circle:nth-of-type(2) { r: 16; }
+.pad-evmap__pop {
+  background: oklch(0.13 0.008 55);
+  border: 1.5px solid var(--accent);
+  padding: 8px 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.pad-evmap__pop-name {
+  font-family: Oswald, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: oklch(0.96 0.005 60);
+  margin: 0 0 2px;
+}
+.pad-evmap__pop-date {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: oklch(0.66 0.015 60);
+  margin: 0 0 4px;
+}
+.pad-evmap__pop a {
+  font-family: Oswald, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.pad-evmap__zoom {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid oklch(0.30 0.02 60);
+  background: oklch(0.13 0.008 55);
+}
+.pad-evmap__zoom button {
+  width: 30px; height: 30px;
+  background: transparent;
+  color: oklch(0.96 0.005 60);
+  border: 0;
+  font-family: Oswald, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+.pad-evmap__zoom button:first-child { border-bottom: 1px solid oklch(0.30 0.02 60); }
+.pad-evmap__zoom button:hover { color: var(--accent); }
+
+@media (max-width: 1024px) {
+  .pad-next {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "left  car"
+      "count count"
+      "cta   cta";
+    gap: 18px;
+  }
+  .pad-next__left  { grid-area: left; }
+  .pad-next__car   { grid-area: car; justify-self: end; }
+  .pad-next__count { grid-area: count; }
+  .pad-next__cta   { grid-area: cta; justify-self: start; }
+  .pad-evmap { grid-template-columns: 1fr; }
+  .pad-evmap__list { border-right: 0; border-bottom: 1px solid oklch(0.22 0.01 55); }
+  .pad-evmap__map { min-height: 320px; }
+}
+
+@media (max-width: 640px) {
+  .pad-next__cells { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .pad-next__cells > div { padding-left: 8px; }
+  .pad-evmap__map { min-height: 260px; }
+}

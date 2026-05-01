@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared.css">
 <link rel="stylesheet" href="paddock.css">
+<link rel="stylesheet" href="../mobile-overrides.css?v=mobile2">
 </head>
 <body class="pad-body">
 
@@ -46,27 +47,170 @@
 
   <div class="pad-calendar">
     <div class="pad-event pad-event--mock">
-      <div class="pad-event__date">12 SEP · ROUND 01</div>
+      <div class="pad-event__date"><span class="kicker">пример</span> · 12 SEP · ROUND 01</div>
       <div class="pad-event__name">Orlando Speed World</div>
       <div class="pad-event__desc">Formula Drift Pro — flagship round on the Orlando Speed World oval. Friday practice, Saturday qualifying, Sunday final.</div>
       <div class="pad-event__foot"><span>ORLANDO · FL</span><span>REGISTER →</span></div>
     </div>
 
     <div class="pad-event pad-event--mock">
-      <div class="pad-event__date">04 OCT · ROUND 02</div>
+      <div class="pad-event__date"><span class="kicker">пример</span> · 04 OCT · ROUND 02</div>
       <div class="pad-event__name">Sebring International</div>
       <div class="pad-event__desc">Pro-Am at the legendary Sebring circuit. Friday night session, tandem battles on Saturday.</div>
       <div class="pad-event__foot"><span>SEBRING · FL</span><span>SOON →</span></div>
     </div>
 
     <div class="pad-event pad-event--mock">
-      <div class="pad-event__date">08 NOV · FINAL</div>
+      <div class="pad-event__date"><span class="kicker">пример</span> · 08 NOV · FINAL</div>
       <div class="pad-event__name">Season Final</div>
       <div class="pad-event__desc">Team championship. Top-8 drivers. Single elimination. Name and venue — your call.</div>
       <div class="pad-event__foot"><span>LOCATION</span><span>TBA →</span></div>
     </div>
   </div>
+
+  <!-- ─── NEXT EVENT · countdown hero ─── -->
+  <div class="pad-next" data-target-iso="2026-09-12T18:00:00Z">
+    <div class="pad-next__left">
+      <span class="kicker">next event</span>
+      <h3>Orlando Speed World</h3>
+      <p class="pad-next__sub">SEP 12-14, 2026 · ORLANDO, FL</p>
+    </div>
+    <svg class="pad-next__car" viewBox="0 0 320 120" aria-hidden="true">
+      <defs>
+        <linearGradient id="smk" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="oklch(0.55 0.02 60)" stop-opacity="0"/>
+          <stop offset="50%" stop-color="oklch(0.55 0.02 60)" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="oklch(0.55 0.02 60)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="80" cy="95" rx="80" ry="14" fill="url(#smk)"/>
+      <ellipse cx="40" cy="78" rx="50" ry="20" fill="url(#smk)" opacity="0.75"/>
+      <path d="M120 80 L130 60 L160 50 L200 50 L230 58 L260 70 L260 84 L130 84 Z" fill="oklch(0.20 0.012 55)" stroke="oklch(0.42 0.02 60)" stroke-width="1"/>
+      <path d="M168 60 L195 56 L218 60 L225 70 L165 70 Z" fill="oklch(0.32 0.10 240)" stroke="oklch(0.55 0.10 240)" stroke-width="0.8" opacity="0.55"/>
+      <circle cx="155" cy="86" r="9" fill="oklch(0.10 0 0)" stroke="oklch(0.42 0.02 60)" stroke-width="1.2"/>
+      <circle cx="155" cy="86" r="4" fill="oklch(0.30 0.02 60)"/>
+      <circle cx="232" cy="86" r="9" fill="oklch(0.10 0 0)" stroke="oklch(0.42 0.02 60)" stroke-width="1.2"/>
+      <circle cx="232" cy="86" r="4" fill="oklch(0.30 0.02 60)"/>
+      <path d="M260 70 L275 62 L290 64 L290 76 L260 76 Z" fill="oklch(0.18 0.012 55)" stroke="oklch(0.42 0.02 60)" stroke-width="1"/>
+    </svg>
+    <div class="pad-next__count" aria-live="polite">
+      <p class="pad-next__count-lab">event starts in</p>
+      <div class="pad-next__cells">
+        <div><b id="cd-d">12</b><span>days</span></div>
+        <div><b id="cd-h">07</b><span>hrs</span></div>
+        <div><b id="cd-m">34</b><span>mins</span></div>
+        <div><b id="cd-s">18</b><span>secs</span></div>
+      </div>
+    </div>
+    <a class="pad-next__cta" href="#">view event →</a>
+  </div>
+
+  <!-- ─── EVENT MAP ─── -->
+  <div class="pad-evmap">
+    <aside class="pad-evmap__list">
+      <p class="kicker">event map</p>
+      <p class="pad-evmap__sub">upcoming events &amp; active tracks</p>
+      <a class="pad-evmap__row" href="#" data-pin="1">
+        <span class="num">01</span>
+        <span class="who"><b>Orlando Speed World</b><em>SEP 12-14, 2026</em></span>
+        <span class="arr">›</span>
+      </a>
+      <a class="pad-evmap__row" href="#" data-pin="2">
+        <span class="num">02</span>
+        <span class="who"><b>Sebring International</b><em>OCT 04-05, 2026</em></span>
+        <span class="arr">›</span>
+      </a>
+      <a class="pad-evmap__row" href="#" data-pin="3">
+        <span class="num">03</span>
+        <span class="who"><b>Season Final</b><em>NOV 08-09, 2026</em></span>
+        <span class="arr">›</span>
+      </a>
+      <a class="pad-evmap__all" href="#">view all events <span>›</span></a>
+    </aside>
+    <figure class="pad-evmap__map" aria-label="Florida event map">
+      <svg viewBox="0 0 800 480" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="grid" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse">
+            <path d="M48 0 L0 0 0 48" fill="none" stroke="oklch(0.20 0.010 55)" stroke-width="0.6"/>
+          </pattern>
+          <radialGradient id="glow1" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.45"/>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="800" height="480" fill="oklch(0.13 0.008 55)"/>
+        <rect width="800" height="480" fill="url(#grid)"/>
+        <path d="M50 110 L210 105 L255 130 L320 115 L420 140 L470 175 L500 240 L555 320 L590 365 L580 405 L535 415 L495 380 L450 330 L420 285 L370 270 L320 280 L280 250 L240 240 L195 220 L160 195 L100 170 L60 155 Z"
+              fill="oklch(0.16 0.008 55)" stroke="oklch(0.40 0.02 60)" stroke-width="1.2" opacity="0.95"/>
+        <text x="370" y="220" fill="oklch(0.55 0.02 60)" font-family="Oswald,sans-serif" font-size="20" letter-spacing="6">FLORIDA</text>
+        <text x="120" y="80" fill="oklch(0.42 0.02 60)" font-family="Oswald,sans-serif" font-size="13" letter-spacing="4">ALABAMA</text>
+        <text x="450" y="80" fill="oklch(0.42 0.02 60)" font-family="Oswald,sans-serif" font-size="13" letter-spacing="4">GEORGIA</text>
+        <text x="200" y="370" fill="oklch(0.42 0.02 60)" font-family="Oswald,sans-serif" font-size="11" letter-spacing="3">GULF OF MEXICO</text>
+        <text x="640" y="285" fill="oklch(0.42 0.02 60)" font-family="Oswald,sans-serif" font-size="11" letter-spacing="3">ATLANTIC OCEAN</text>
+        <g class="pad-evmap__pin" data-pin="1">
+          <circle cx="445" cy="195" r="38" fill="url(#glow1)"/>
+          <circle cx="445" cy="195" r="14" fill="var(--accent)"/>
+          <text x="445" y="200" text-anchor="middle" fill="oklch(0.10 0 0)" font-family="Oswald,sans-serif" font-weight="700" font-size="13">01</text>
+          <foreignObject x="475" y="160" width="240" height="80">
+            <div xmlns="http://www.w3.org/1999/xhtml" class="pad-evmap__pop">
+              <p class="pad-evmap__pop-name">ORLANDO SPEED WORLD</p>
+              <p class="pad-evmap__pop-date">SEP 12-14, 2026</p>
+              <a href="#">view event →</a>
+            </div>
+          </foreignObject>
+        </g>
+        <g class="pad-evmap__pin" data-pin="2">
+          <circle cx="395" cy="285" r="34" fill="url(#glow1)"/>
+          <circle cx="395" cy="285" r="13" fill="var(--accent)"/>
+          <text x="395" y="290" text-anchor="middle" fill="oklch(0.10 0 0)" font-family="Oswald,sans-serif" font-weight="700" font-size="12">02</text>
+          <foreignObject x="290" y="305" width="220" height="80">
+            <div xmlns="http://www.w3.org/1999/xhtml" class="pad-evmap__pop">
+              <p class="pad-evmap__pop-name">SEBRING INTERNATIONAL</p>
+              <p class="pad-evmap__pop-date">OCT 04-05, 2026</p>
+              <a href="#">view event →</a>
+            </div>
+          </foreignObject>
+        </g>
+        <g class="pad-evmap__pin" data-pin="3">
+          <circle cx="490" cy="365" r="34" fill="url(#glow1)"/>
+          <circle cx="490" cy="365" r="13" fill="var(--accent)"/>
+          <text x="490" y="370" text-anchor="middle" fill="oklch(0.10 0 0)" font-family="Oswald,sans-serif" font-weight="700" font-size="12">03</text>
+          <foreignObject x="520" y="335" width="230" height="80">
+            <div xmlns="http://www.w3.org/1999/xhtml" class="pad-evmap__pop">
+              <p class="pad-evmap__pop-name">SEASON FINAL</p>
+              <p class="pad-evmap__pop-date">NOV 08-09, 2026</p>
+              <a href="#">view event →</a>
+            </div>
+          </foreignObject>
+        </g>
+      </svg>
+      <div class="pad-evmap__zoom">
+        <button aria-label="zoom in">+</button>
+        <button aria-label="zoom out">−</button>
+      </div>
+    </figure>
+  </div>
 </section>
+
+<script>
+(function(){
+  const target = new Date(document.querySelector('.pad-next')?.dataset.targetIso ?? '2026-09-12T18:00:00Z').getTime();
+  const d = document.getElementById('cd-d'), h = document.getElementById('cd-h'),
+        m = document.getElementById('cd-m'), s = document.getElementById('cd-s');
+  function tick() {
+    const left = Math.max(0, target - Date.now());
+    const days = Math.floor(left / 86400000),
+          hrs  = Math.floor((left % 86400000) / 3600000),
+          mins = Math.floor((left % 3600000) / 60000),
+          secs = Math.floor((left % 60000) / 1000);
+    if (d) d.textContent = String(days).padStart(2,'0');
+    if (h) h.textContent = String(hrs).padStart(2,'0');
+    if (m) m.textContent = String(mins).padStart(2,'0');
+    if (s) s.textContent = String(secs).padStart(2,'0');
+  }
+  tick(); setInterval(tick, 1000);
+})();
+</script>
 
 <footer class="pad-footer">
   <div class="pad-footer__mono">
