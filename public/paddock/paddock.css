@@ -724,6 +724,48 @@
   .pad-footer__grid { grid-template-columns: 1fr; }
 }
 
+/* ─── Scroll marquee ticker (Jersey-style strip) ─── */
+.pad-marquee {
+  margin: 0;
+  padding: 14px 0;
+  background: oklch(0.10 0.005 55);
+  border-top: 1px solid oklch(0.30 0.02 60);
+  border-bottom: 1px solid oklch(0.30 0.02 60);
+  overflow: hidden;
+}
+.pad-marquee__track {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  white-space: nowrap;
+  width: max-content;
+  animation: padMarqueeScroll 38s linear infinite;
+  font-family: Oswald, 'Bebas Neue', sans-serif;
+  font-weight: 700;
+  font-size: clamp(20px, 2vw, 28px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: oklch(0.78 0.012 60);
+}
+.pad-marquee__track b { color: var(--accent); }
+.pad-marquee__track span { display: inline-flex; align-items: center; }
+.pad-marquee__track span::after {
+  content: "◢";
+  margin-left: 40px;
+  color: var(--accent);
+  font-size: 0.78em;
+  line-height: 1;
+}
+.pad-marquee:hover .pad-marquee__track { animation-play-state: paused; }
+[data-motion="off"] .pad-marquee__track,
+@media (prefers-reduced-motion: reduce) {
+  .pad-marquee__track { animation: none; }
+}
+@keyframes padMarqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 /* ─── Calendar: kicker on event card date ─── */
 .pad-event__date .kicker {
   font-family: 'JetBrains Mono', monospace;
