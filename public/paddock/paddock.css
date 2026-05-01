@@ -1195,3 +1195,96 @@
   .pad-next__cells > div { padding-left: 8px; }
   .pad-evmap__map { min-height: 260px; }
 }
+
+/* ─── iPhone-class screens (≤480) — compact paddock layouts ─── */
+@media (max-width: 480px) {
+  /* Hero title: tighten leading so 3 huge stacked words don't push the page */
+  .pad-hero__title {
+    font-size: clamp(56px, 18vw, 96px);
+    line-height: 0.86;
+    letter-spacing: -0.01em;
+  }
+  .pad-hero__title .stencil { -webkit-text-stroke-width: 2px; }
+
+  /* Hero top meta line wraps to two rows; tighten spacing */
+  .pad-hero__top {
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 10px;
+  }
+
+  /* Section heads stack a bit cleaner */
+  .pad-section__head { padding-left: 16px; padding-right: 16px; }
+  .pad-section__head .num { font-size: 64px; }
+
+  /* Marquee: smaller text + slower scroll feels nicer on narrow screens */
+  .pad-marquee { padding: 10px 0; }
+  .pad-marquee__track {
+    font-size: 17px;
+    gap: 26px;
+    animation-duration: 28s;
+  }
+  .pad-marquee__track span::after { margin-left: 26px; }
+
+  /* NEXT EVENT — fully stacked. Keep countdown horizontal but smaller. */
+  .pad-next {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "left"
+      "car"
+      "count"
+      "cta";
+    gap: 14px;
+    padding: 18px 16px;
+  }
+  .pad-next h3 { font-size: 24px; line-height: 1; }
+  .pad-next__sub { font-size: 10px; }
+  .pad-next__car { width: 100%; max-width: 320px; justify-self: start; }
+  .pad-next.has-photo img.pad-next__car { max-height: 140px; width: 100%; }
+  .pad-next__cells { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .pad-next__cells > div { padding-left: 6px; align-items: flex-start; }
+  .pad-next__cells > div:first-child { padding-left: 0; }
+  .pad-next__cells b { font-size: 26px; }
+  .pad-next__cells span { font-size: 9px; letter-spacing: 0.14em; }
+  .pad-next__cta { padding: 10px 18px; font-size: 11px; letter-spacing: 0.14em; }
+
+  /* EVENT MAP — collapse + shorter map */
+  .pad-evmap__list { padding: 16px; }
+  .pad-evmap__list .kicker { font-size: 18px; }
+  .pad-evmap__row { padding: 8px 10px; }
+  .pad-evmap__row .num { width: 24px; height: 24px; font-size: 11px; }
+  .pad-evmap__row .who b { font-size: 12px; }
+  .pad-evmap__map { min-height: 220px; }
+  .pad-evmap__zoom { right: 10px; bottom: 10px; }
+  .pad-evmap__zoom button { width: 26px; height: 26px; font-size: 14px; }
+
+  /* Calendar event cards: reduce padding so dense kicker line still fits */
+  .pad-event { padding: 14px; }
+  .pad-event__name { font-size: 22px; line-height: 1.05; }
+  .pad-event__date { font-size: 11px; letter-spacing: 0.04em; flex-wrap: wrap; }
+  .pad-event__date .kicker { font-size: 9px; letter-spacing: 0.16em; }
+  .pad-event__desc { font-size: 13px; line-height: 1.45; }
+  .pad-event__foot { font-size: 10px; gap: 6px; }
+
+  /* JOIN THE TEAM CTA: tighten the giant headline + button */
+  .pad-cta { padding: 48px 20px; }
+  .pad-cta h3 { font-size: clamp(40px, 14vw, 64px); }
+  .pad-cta p { font-size: 14px; line-height: 1.5; margin-bottom: 22px; }
+  .pad-cta__btn { padding: 12px 22px; font-size: 12px; letter-spacing: 0.14em; }
+  /* Hide the diagonal hazard side-strips on narrow phones — they steal width */
+  .pad-cta::before, .pad-cta::after { width: 24px; opacity: 0.18; }
+
+  /* Footer: tighter mono row */
+  .pad-footer { padding: 18px 16px; }
+  .pad-footer__mono { flex-direction: column; gap: 4px; align-items: flex-start; font-size: 10px; }
+}
+
+/* ─── Notch + dynamic island safe-area on landscape too ─── */
+@supports (padding: max(0px)) {
+  .pad-strip { padding-top: max(0px, env(safe-area-inset-top)); }
+  .topbar { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  .pad-section, .pad-cta, .pad-marquee, .pad-evmap, .pad-next {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
