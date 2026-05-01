@@ -70,6 +70,24 @@
   position: relative;
   z-index: 2;
 }
+.pad-hero__title .line {
+  display: block;
+  overflow: hidden;
+}
+.pad-hero__title .line > .fill,
+.pad-hero__title .line > .stencil {
+  animation: padHeroRise 0.8s var(--ease) both;
+}
+.pad-hero__title .line:nth-child(2) > span { animation-delay: 0.10s; }
+.pad-hero__title .line:nth-child(3) > span { animation-delay: 0.20s; }
+@keyframes padHeroRise {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+[data-motion="off"] .pad-hero__title .line > span { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .pad-hero__title .line > span { animation: none; }
+}
 .pad-hero__title .stencil {
   display: block;
   color: transparent;
