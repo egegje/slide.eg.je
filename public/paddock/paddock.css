@@ -850,6 +850,40 @@
   to   { transform: translateX(-50%); }
 }
 
+/* ─── Calendar event card with admin-uploaded photo ─── */
+.pad-event.pad-event--mock.has-photo {
+  position: relative;
+  background-image: var(--bg-img);
+  background-size: cover;
+  background-position: center;
+  border-color: oklch(0.30 0.02 60);
+  opacity: 1;
+  border-style: solid;
+}
+.pad-event.pad-event--mock.has-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, oklch(0.10 0.005 55 / 0.55) 0%, oklch(0.10 0.005 55 / 0.92) 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+.pad-event.pad-event--mock.has-photo > * { position: relative; z-index: 1; }
+.pad-event.pad-event--mock.has-photo .pad-event__date,
+.pad-event.pad-event--mock.has-photo .pad-event__name,
+.pad-event.pad-event--mock.has-photo .pad-event__desc,
+.pad-event.pad-event--mock.has-photo .pad-event__foot { color: oklch(0.94 0.005 60); }
+
+/* NEXT EVENT: when admin uploaded photo, swap SVG → real image */
+.pad-next.has-photo img.pad-next__car {
+  width: clamp(220px, 28vw, 360px);
+  height: auto;
+  max-height: 160px;
+  object-fit: cover;
+  border: 1.5px solid oklch(0.30 0.02 60);
+  filter: drop-shadow(0 8px 14px oklch(0 0 0 / 0.45));
+}
+
 /* ─── Calendar: kicker on event card date ─── */
 .pad-event__date .kicker {
   font-family: 'JetBrains Mono', monospace;

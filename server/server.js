@@ -42,6 +42,7 @@ const PHOTO_SPECS = {
   driver:  { label: "Пилот · 4:5",  min: "800×1000", max: "5 МБ", note: "Портрет, лицо в центре. JPG / PNG / WEBP.",   aspect: "4/5" },
   track:   { label: "Трасса · 16:9", min: "1200×675", max: "5 МБ", note: "Аэро или панорама трассы. JPG / PNG / WEBP.",   aspect: "16/9" },
   car:     { label: "Машина · 4:3",  min: "1200×900", max: "5 МБ", note: "Машина в кадре, контрастный фон. JPG / PNG / WEBP.", aspect: "4/3" },
+  calendar:{ label: "Событие · 16:9", min: "1200×675", max: "5 МБ", note: "Машина в дыму / трасса. Заполняет фон карточки события.", aspect: "16/9" },
   gallery: { label: "Галерея",       min: "—",         max: "25 МБ фото / 200 МБ видео", note: "Любые фото и видео.", aspect: "1/1" },
 };
 
@@ -396,24 +397,36 @@ const DASH_HTML = `<!doctype html>
     .layout { grid-template-columns: 1fr; grid-template-rows: 50% 50%; }
     .rail { border-right: 0; border-bottom: 1px solid var(--line); }
   }
+
+  /* Collapsible rail */
+  .layout { transition: grid-template-columns .25s ease; }
+  .layout.rail-hidden { grid-template-columns: 0 1fr; }
+  .rail { transition: transform .25s ease; }
+  .layout.rail-hidden .rail { transform: translateX(-100%); }
+  #rail-toggle { position: fixed; top: 50%; left: 360px; transform: translate(-50%, -50%); z-index: 60; width: 30px; height: 60px; background: var(--accent); color: white; border: none; border-radius: 0 8px 8px 0; cursor: pointer; font-size: 18px; font-weight: 700; line-height: 60px; text-align: center; padding: 0; transition: left .25s ease, box-shadow .15s; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+  body.rail-hidden #rail-toggle { left: 0; }
+  #rail-toggle:hover { box-shadow: 0 6px 16px rgba(255,59,48,0.5); }
+  #rail-toggle::before { content: '‹'; display: block; }
+  body.rail-hidden #rail-toggle::before { content: '›'; }
+  @media (max-width: 900px) { #rail-toggle { display: none; } }
 </style></head><body>
 <div class="top">
   <h1>Dark Force / admin</h1>
   <div class="who">$WHO$ · <a href="#" onclick="logout();return false">выйти</a></div>
 </div>
-<div class="layout">
+<div class="layout" id="layout">
   <aside class="rail" id="rail"></aside>
   <main class="preview">
     <div class="preview__bar">
       <button data-variant="apex" class="on" onclick="setVariant('apex')">Apex</button>
       <button data-variant="paddock" onclick="setVariant('paddock')">Paddock</button>
-      <button data-variant="telemetry" onclick="setVariant('telemetry')">Telemetry</button>
       <span class="grow"></span>
       <span class="url" id="frame-url">/apex/home.html</span>
     </div>
     <div class="frame-wrap"><iframe class="frame" id="frame" src="/apex/home.html?draft=1"></iframe></div>
   </main>
 </div>
+<button id="rail-toggle" type="button" title="Скрыть/показать панель"></button>
 
 <script>
   const SPECS = $SPECS$;
@@ -463,6 +476,7 @@ const DASH_HTML = `<!doctype html>
     if (slotId.startsWith('driver-')) return 'driver';
     if (slotId.startsWith('track-')) return 'track';
     if (slotId.startsWith('car-')) return 'car';
+    if (slotId.startsWith('calendar-')) return 'calendar';
     return null;
   }
 
@@ -510,6 +524,7 @@ const DASH_HTML = `<!doctype html>
     state.tracks = data.tracks || [];
     state.cars = data.cars || [];
     state.eventPoster = data.eventPoster || {};
+    state.calendarPhotos = data.calendarPhotos || {};
     state.gallery = data.gallery || [];
     renderRail();
     await refreshPublishStatus();
@@ -529,6 +544,13 @@ const DASH_HTML = `<!doctype html>
       renderSlot('car-' + c.id, c.name, [c.engine, c.hp ? c.hp + ' HP' : null].filter(Boolean).join(' · '), !!c.photo, c.photo, 'car', c.id)
     ).join('');
     const gallerySection = renderGallerySection();
+
+    const cp = state.calendarPhotos || {};
+    const calendarSlots =
+      renderSlot('calendar-next', 'NEXT EVENT (фон с машиной)', 'фон большого блока «следующий ивент»', !!(cp.next && cp.next.photo), cp.next && cp.next.photo) +
+      renderSlot('calendar-ev1', 'Карточка 1 · Orlando',  'фон первой карточки в ряду',                  !!(cp.ev1 && cp.ev1.photo),  cp.ev1 && cp.ev1.photo) +
+      renderSlot('calendar-ev2', 'Карточка 2 · Sebring',  'фон второй карточки в ряду',                 !!(cp.ev2 && cp.ev2.photo),  cp.ev2 && cp.ev2.photo) +
+      renderSlot('calendar-ev3', 'Карточка 3 · Final',    'фон третьей карточки в ряду',                !!(cp.ev3 && cp.ev3.photo),  cp.ev3 && cp.ev3.photo);
 
     const driverNew = state.newForm === 'driver' ? renderDriverForm() : '';
     const trackNew = state.newForm === 'track' ? renderTrackForm() : '';
@@ -561,6 +583,11 @@ const DASH_HTML = `<!doctype html>
         '</div>' +
         '<div class="group__hint">' + escHtml(SPECS.car.label + ' · от ' + SPECS.car.min) + '</div>' +
         carNew + carSlots +
+      '</div>' +
+      '<div class="group">' +
+        '<div class="group__title"><b>Календарь · фото</b><span>4 слота</span></div>' +
+        '<div class="group__hint">' + escHtml(SPECS.calendar.label + ' · от ' + SPECS.calendar.min + ' · до ' + SPECS.calendar.max) + '</div>' +
+        calendarSlots +
       '</div>' +
       '<div class="group">' +
         '<div class="group__title"><b>Галерея</b><span>' + state.gallery.length + ' файлов</span></div>' +
@@ -1029,6 +1056,10 @@ const DASH_HTML = `<!doctype html>
     } else if (k === 'car') {
       const id = parseInt(slotId.slice(4), 10);
       entity = state.cars.find((x) => x.id === id);
+    } else if (k === 'calendar') {
+      const key = slotId.slice(9); // 'next' | 'ev1' | 'ev2' | 'ev3'
+      state.calendarPhotos = state.calendarPhotos || {};
+      entity = state.calendarPhotos[key] || (state.calendarPhotos[key] = {});
     }
     if (!entity || !entity.photo) { toast('Сначала загрузи фото'); return; }
     const focal = entity.photoFocal || { x: 50, y: 50, zoom: 1 };
@@ -1314,6 +1345,23 @@ const DASH_HTML = `<!doctype html>
   });
 
   loadAll();
+
+  // Rail toggle — collapse the left admin panel to see the site full-width.
+  (function () {
+    const btn = document.getElementById('rail-toggle');
+    const layout = document.getElementById('layout');
+    if (!btn || !layout) return;
+    const KEY = 'darkforce-rail-hidden';
+    if (localStorage.getItem(KEY) === '1') {
+      layout.classList.add('rail-hidden');
+      document.body.classList.add('rail-hidden');
+    }
+    btn.addEventListener('click', () => {
+      const hidden = layout.classList.toggle('rail-hidden');
+      document.body.classList.toggle('rail-hidden', hidden);
+      localStorage.setItem(KEY, hidden ? '1' : '0');
+    });
+  })();
 </script>
 </body></html>`;
 
@@ -1368,6 +1416,13 @@ function resolveSlot(slotId, data) {
     const car = (data.cars || []).find((x) => x.id === id);
     if (!car) return null;
     return { kind: "car", dirName: "cars", target: car, photoPrefix: "/photos/cars/" };
+  }
+  if (slotId.startsWith("calendar-")) {
+    const key = slotId.slice(9); // 'next' | 'ev1' | 'ev2' | 'ev3'
+    if (!["next", "ev1", "ev2", "ev3"].includes(key)) return null;
+    if (!data.calendarPhotos) data.calendarPhotos = {};
+    if (!data.calendarPhotos[key]) data.calendarPhotos[key] = { photo: null };
+    return { kind: "calendar", dirName: "calendar", target: data.calendarPhotos[key], photoPrefix: "/photos/calendar/" };
   }
   return null;
 }

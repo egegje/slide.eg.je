@@ -46,21 +46,21 @@
   </div>
 
   <div class="pad-calendar">
-    <div class="pad-event pad-event--mock">
+    <div class="pad-event pad-event--mock" data-slot="calendar-ev1">
       <div class="pad-event__date"><span class="kicker">пример</span> · 12 SEP · ROUND 01</div>
       <div class="pad-event__name">Orlando Speed World</div>
       <div class="pad-event__desc">Formula Drift Pro — flagship round on the Orlando Speed World oval. Friday practice, Saturday qualifying, Sunday final.</div>
       <div class="pad-event__foot"><span>ORLANDO · FL</span><span>REGISTER →</span></div>
     </div>
 
-    <div class="pad-event pad-event--mock">
+    <div class="pad-event pad-event--mock" data-slot="calendar-ev2">
       <div class="pad-event__date"><span class="kicker">пример</span> · 04 OCT · ROUND 02</div>
       <div class="pad-event__name">Sebring International</div>
       <div class="pad-event__desc">Pro-Am at the legendary Sebring circuit. Friday night session, tandem battles on Saturday.</div>
       <div class="pad-event__foot"><span>SEBRING · FL</span><span>SOON →</span></div>
     </div>
 
-    <div class="pad-event pad-event--mock">
+    <div class="pad-event pad-event--mock" data-slot="calendar-ev3">
       <div class="pad-event__date"><span class="kicker">пример</span> · 08 NOV · FINAL</div>
       <div class="pad-event__name">Season Final</div>
       <div class="pad-event__desc">Team championship. Top-8 drivers. Single elimination. Name and venue — your call.</div>
@@ -69,7 +69,7 @@
   </div>
 
   <!-- ─── NEXT EVENT · countdown hero ─── -->
-  <div class="pad-next" data-target-iso="2026-09-12T18:00:00Z">
+  <div class="pad-next" data-target-iso="2026-09-12T18:00:00Z" data-slot="calendar-next">
     <div class="pad-next__left">
       <span class="kicker">next event</span>
       <h3>Orlando Speed World</h3>
@@ -192,6 +192,7 @@
   </div>
 </section>
 
+<script src="../drift-data.js"></script>
 <script>
 (function(){
   const target = new Date(document.querySelector('.pad-next')?.dataset.targetIso ?? '2026-09-12T18:00:00Z').getTime();
@@ -209,6 +210,32 @@
     if (s) s.textContent = String(secs).padStart(2,'0');
   }
   tick(); setInterval(tick, 1000);
+
+  // Pack admin photos onto the calendar cards
+  const photos = (window.DRIFT_DATA && window.DRIFT_DATA.calendarPhotos) || {};
+  const apply = (slotId, key) => {
+    const url = photos[key] && photos[key].photo;
+    if (!url) return;
+    const node = document.querySelector('[data-slot="' + slotId + '"]');
+    if (!node) return;
+    node.classList.add('has-photo');
+    node.style.setProperty('--bg-img', 'url(' + url + ')');
+    if (slotId === 'calendar-next') {
+      // Replace the inline SVG car with the uploaded photo
+      const svg = node.querySelector('.pad-next__car');
+      if (svg) {
+        const img = document.createElement('img');
+        img.className = 'pad-next__car';
+        img.src = url;
+        img.alt = '';
+        svg.replaceWith(img);
+      }
+    }
+  };
+  apply('calendar-next', 'next');
+  apply('calendar-ev1', 'ev1');
+  apply('calendar-ev2', 'ev2');
+  apply('calendar-ev3', 'ev3');
 })();
 </script>
 
