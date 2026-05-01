@@ -148,6 +148,18 @@
       burger.setAttribute('aria-expanded', 'false');
       burger.innerHTML = '<span></span><span></span><span></span>';
       inner.appendChild(burger);
+      // Real backdrop element (sibling of bar) — ::before pseudo can't reliably
+      // catch click events across browsers, so use a real div.
+      const backdrop = document.createElement('div');
+      backdrop.className = 'topbar__backdrop';
+      backdrop.setAttribute('aria-hidden', 'true');
+      bar.parentNode.insertBefore(backdrop, bar.nextSibling);
+
+      const close = () => {
+        bar.classList.remove('topbar--open');
+        burger.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('no-scroll');
+      };
       burger.addEventListener('click', () => {
         const open = bar.classList.toggle('topbar--open');
         burger.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -155,11 +167,13 @@
       });
       // Close on nav link click
       bar.querySelectorAll('.nav a').forEach((a) => {
-        a.addEventListener('click', () => {
-          bar.classList.remove('topbar--open');
-          burger.setAttribute('aria-expanded', 'false');
-          document.body.classList.remove('no-scroll');
-        });
+        a.addEventListener('click', close);
+      });
+      // Close on backdrop tap
+      backdrop.addEventListener('click', close);
+      // Close on Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && bar.classList.contains('topbar--open')) close();
       });
     });
   });

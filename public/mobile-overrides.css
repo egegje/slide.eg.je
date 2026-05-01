@@ -55,26 +55,47 @@ input, textarea, select { font-size: 16px; }   /* prevent iOS zoom */
    ============================================ */
 @media (max-width: 820px) {
   .topbar { z-index: 60 !important; }
-  .nav {
-    background: oklch(0.10 0.012 250) !important;
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    z-index: 200 !important;
-    box-shadow: 0 12px 40px oklch(0 0 0 / 0.6);
-  }
-  /* Solid backdrop layer behind the drawer so nothing leaks through */
-  .nav::before {
-    content: "";
+
+  /* Real backdrop element injected by shared.js — sits ABOVE all page
+     content but BELOW the drawer + burger. Solid dark + blur kills any
+     text bleed-through. */
+  .topbar__backdrop {
     position: fixed;
     inset: 0;
-    background: oklch(0.10 0.012 250);
-    z-index: -1;
+    background: oklch(0.08 0.005 55 / 0.94);
+    -webkit-backdrop-filter: blur(10px) saturate(0.6);
+    backdrop-filter: blur(10px) saturate(0.6);
+    z-index: 150;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 180ms ease-out;
   }
-  .topbar--open .nav { z-index: 200 !important; }
-  .topbar--open .topbar__burger { z-index: 210 !important; position: relative; }
+  .topbar.topbar--open ~ .topbar__backdrop {
+    pointer-events: auto;
+    opacity: 1;
+    cursor: pointer;
+  }
+
+  /* Drawer itself: solid surface, clearly above backdrop */
+  .topbar.topbar--open .nav {
+    background: oklch(0.10 0.012 250) !important;
+    z-index: 200 !important;
+    box-shadow: 0 12px 40px oklch(0 0 0 / 0.6);
+    border-left: 1px solid oklch(0.30 0.02 60);
+  }
+  .topbar.topbar--open .topbar__burger {
+    z-index: 210 !important;
+    position: relative;
+  }
+
   /* Lock body scroll while drawer is open */
   body:has(.topbar--open) { overflow: hidden; }
+  body.no-scroll { overflow: hidden; }
 }
+
+/* Backdrop hidden on desktop — pointer-events:none means it's harmless even visible */
+.topbar__backdrop { display: none; }
+@media (max-width: 820px) { .topbar__backdrop { display: block; } }
 
 /* iOS safe-area + sticky topbar safety */
 @supports (padding: max(0px)) {
