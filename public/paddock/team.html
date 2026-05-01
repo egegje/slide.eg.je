@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared.css">
-<link rel="stylesheet" href="../apex/apex.css">
+<link rel="stylesheet" href="apex-team-styles.css">
 <link rel="stylesheet" href="../mobile-overrides.css?v=mobile2">
 <style>
   /* Team-specific compositions built on top of apex primitives */
@@ -320,7 +320,10 @@
     border-color: var(--accent);
   }
 </style>
-</head><body class="apex-body">
+<link rel="stylesheet" href="paddock.css">
+</head><body class="pad-body apex-body">
+
+<div class="pad-strip"></div>
 
 <header class="topbar">
   <div class="topbar__inner">
@@ -331,13 +334,13 @@
       DRIFT<b>.EG.JE</b>
     </a>
     <nav class="nav">
-      <a href="../apex/home.html">Home</a>
-      <a class="active" href="../apex/team.html">Team</a>
-      <a href="../apex/drivers.html">Drivers</a>
-      <a href="../apex/calendar.html">Calendar</a>
-      <a href="../apex/tracks.html">Tracks</a>
-      <a href="../apex/gallery.html">Gallery</a>
-      <a href="../apex/shop.html">Shop</a>
+      <a href="home.html">Home</a>
+      <a class="active" href="team.html">Team</a>
+      <a href="drivers.html">Drivers</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="tracks.html">Tracks</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="shop.html">Shop</a>
     </nav>
     <div class="topbar__right">
       <a class="btn btn--primary" href="https://t.me/x7777708" target="_blank" rel="noopener">Join</a>
@@ -369,7 +372,7 @@
       <div class="when" id="hero-tagline">—</div>
     </div>
     <div class="apex-hero__cta">
-      <a class="btn btn--primary" href="../apex/drivers.html">Roster →</a>
+      <a class="btn btn--primary" href="drivers.html">Roster →</a>
     </div>
   </div>
 
@@ -480,34 +483,10 @@
 </section>
 
 <!-- FOOTER -->
-<footer class="apex-footer">
-  <div class="apex-footer__grid">
-    <div>
-      <div class="brand" style="margin-bottom:14px">
-        <svg class="monster-head" viewBox="0 0 28 28" fill="none"><path d="M4 4 L14 10 L24 4 L22 16 L26 22 L14 26 L2 22 L6 16 Z" fill="var(--accent)"/></svg>
-        DRIFT<b>.EG.JE</b>
-      </div>
-      <p style="font-size:13px;color:var(--fg-dim);line-height:1.5;max-width:320px">Drift community Dark Force. Drivers, tracks, services.</p>
-    </div>
-    <div>
-      <h5>The Team</h5>
-      <a href="../apex/team.html">About</a>
-      <a href="../apex/drivers.html">Drivers</a>
-      <a href="../apex/gallery.html">Gallery</a>
-    </div>
-    <div>
-      <h5>Racing</h5>
-      <a href="../apex/calendar.html">Calendar</a>
-      <a href="../apex/tracks.html">Tracks</a>
-    </div>
-    <div>
-      <h5>Services</h5>
-      <a href="../apex/shop.html">All services</a>
-    </div>
-  </div>
-  <div class="apex-footer__mono">
+<footer class="pad-footer">
+  <div class="pad-footer__mono">
     <span>© 2026 DRIFT.EG.JE</span>
-    <span>Apex variant · team</span>
+    <span>Paddock variant · team</span>
   </div>
 </footer>
 
